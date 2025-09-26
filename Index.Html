@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt Glitch Labyrinth</title>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #111;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Receipt styling */
+        .receipt {
+            background-color: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .receipt::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 5px,
+                #000 5px,
+                #000 10px
+            );
+        }
+        
+        .receipt::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 5px,
+                #000 5px,
+                #000 10px
+            );
+        }
+        
+        /* Glitch effects */
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 red;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: 1px 0 blue;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(42px, 9999px, 44px, 0); }
+            5% { clip: rect(12px, 9999px, 59px, 0); }
+            10% { clip: rect(48px, 9999px, 29px, 0); }
+            15% { clip: rect(42px, 9999px, 73px, 0); }
+            20% { clip: rect(63px, 9999px, 27px, 0); }
+            25% { clip: rect(34px, 9999px, 55px, 0); }
+            30% { clip: rect(86px, 9999px, 73px, 0); }
+            35% { clip: rect(20px, 9999px, 20px, 0); }
+            40% { clip: rect(26px, 9999px, 60px, 0); }
+            45% { clip: rect(25px, 9999px, 66px, 0); }
+            50% { clip: rect(57px, 9999px, 98px, 0); }
+            55% { clip: rect(5px, 9999px, 46px, 0); }
+            60% { clip: rect(82px, 9999px, 31px, 0); }
+            65% { clip: rect(54px, 9999px, 27px, 0); }
+            70% { clip: rect(28px, 9999px, 99px, 0); }
+            75% { clip: rect(45px, 9999px, 69px, 0); }
+            80% { clip: rect(23px, 9999px, 85px, 0); }
+            85% { clip: rect(54px, 9999px, 84px, 0); }
+            90% { clip: rect(45px, 9999px, 47px, 0); }
+            95% { clip: rect(37px, 9999px, 20px, 0); }
+            100% { clip: rect(4px, 9999px, 91px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            5% { clip: rect(52px, 9999px, 74px, 0); }
+            10% { clip: rect(79px, 9999px, 85px, 0); }
+            15% { clip: rect(75px, 9999px, 5px, 0); }
+            20% { clip: rect(67px, 9999px, 61px, 0); }
+            25% { clip: rect(14px, 9999px, 79px, 0); }
+            30% { clip: rect(1px, 9999px, 66px, 0); }
+            35% { clip: rect(86px, 9999px, 30px, 0); }
+            40% { clip: rect(23px, 9999px, 98px, 0); }
+            45% { clip: rect(85px, 9999px, 72px, 0); }
+            50% { clip: rect(71px, 9999px, 75px, 0); }
+            55% { clip: rect(2px, 9999px, 48px, 0); }
+            60% { clip: rect(30px, 9999px, 16px, 0); }
+            65% { clip: rect(59px, 9999px, 50px, 0); }
+            70% { clip: rect(41px, 9999px, 62px, 0); }
+            75% { clip: rect(2px, 9999px, 82px, 0); }
+            80% { clip: rect(47px, 9999px, 73px, 0); }
+            85% { clip: rect(3px, 9999px, 27px, 0); }
+            90% { clip: rect(26px, 9999px, 55px, 0); }
+            95% { clip: rect(42px, 9999px, 97px, 0); }
+            100% { clip: rect(38px, 9999px, 49px, 0); }
+        }
+        
+        .flicker {
+            animation: flicker 3s linear infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .shake {
+            animation: shake 0.5s linear infinite;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+            20%, 40%, 60%, 80% { transform: translateX(2px); }
+        }
+        
+        /* Button styles */
+        button {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        
+        /* Stage-specific styles */
+        .stage {
+            display: none;
+            text-align: center;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        /* Printer animation */
+        .printer {
+            position: relative;
+            width: 300px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .printer::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 10px;
+            right: 10px;
+            height: 5px;
+            background-color: #666;
+        }
+        
+        .paper {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 0;
+            background-color: #fff;
+            transition: height 2s ease-in-out;
+            overflow: hidden;
+        }
+        
+        .paper-content {
+            padding: 20px;
+            color: #000;
+            text-align: left;
+            opacity: 0;
+            transition: opacity 1s ease-in-out 1s;
+        }
+        
+        .paper.printed {
+            height: 200px;
+        }
+        
+        .paper.printed .paper-content {
+            opacity: 1;
+        }
+        
+        /* Stage 1 - Overcharged Items */
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ccc;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .receipt-item.crossed-out {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+        
+        /* Stage 2 - Hidden Code */
+        .hidden-text {
+            background-color: #000;
+            color: #000;
+            padding: 10px;
+            user-select: none;
+            cursor: grab;
+            position: relative;
+        }
+        
+        .hidden-text.revealed {
+            color: #fff;
+            background-color: #333;
+        }
+        
+        /* Stage 3 - Endless Scroll */
+        .scroll-container {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #fff;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        /* Stage 4 - Glitch Portal */
+        .game-container {
+            position: relative;
+            height: 400px;
+            border: 1px solid #fff;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .falling-receipt {
+            position: absolute;
+            background-color: #fff;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        .falling-receipt.caught {
+            animation: caught 0.5s forwards;
+        }
+        
+        @keyframes caught {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+        
+        .score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        /* Stage 5 - Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #333;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            width: 0%;
+            height: 30px;
+            background-color: #fff;
+            transition: width 0.1s linear;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .status-text {
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        /* Final stage */
+        .shredder {
+            position: relative;
+            width: 300px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background-color: #333;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .shredder::before {
+            content: "";
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            right: 10px;
+            height: 10px;
+            background-color: #666;
+        }
+        
+        .shredded-paper {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 5px,
+                #fff 5px,
+                #fff 10px
+            );
+            animation: shred 2s forwards;
+        }
+        
+        @keyframes shred {
+            0% { height: 100%; }
+            100% { height: 0; }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .receipt {
+                max-width: 100%;
+            }
+            
+            .printer, .shredder {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .game-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Initial Stage - Printer Animation -->
+        <div id="stage0" class="stage active">
+            <h1 class="glitch flicker" data-text="Receipt Glitch Labyrinth">Receipt Glitch Labyrinth</h1>
+            <div class="printer">
+                <div class="paper">
+                    <div class="paper-content">
+                        <p>⚠ SYSTEM ERROR: Handling Fee Not Found.</p>
+                        <p>Please verify your transaction.</p>
+                    </div>
+                </div>
+            </div>
+            <button id="unrollBtn">Unroll Receipt</button>
+        </div>
+        
+        <!-- Stage 1 - Overcharged Items Riddle -->
+        <div id="stage1" class="stage">
+            <div class="receipt">
+                <h3>STORE RECEIPT</h3>
+                <p>================================</p>
+                <div class="receipt-item" data-fake="true">Patience Fee - ₹9,999</div>
+                <div class="receipt-item" data-fake="false">Free Wi-Fi - ₹0.00</div>
+                <div class="receipt-item" data-fake="true">Midlife Crisis - Priceless</div>
+                <div class="receipt-item" data-fake="false">Tax - ₹120.50</div>
+                <div class="receipt-item" data-fake="true">Invisible Ink - ₹4,299</div>
+                <div class="receipt-item" data-fake="false">Subtotal - ₹1,200.50</div>
+                <p>================================</p>
+                <p>Tap to cross out fake charges</p>
+            </div>
+            <p id="stage1Message">Cross out at least 2 fake charges</p>
+            <button id="stage1Btn" disabled>Continue</button>
+        </div>
+        
+        <!-- Stage 2 - Hidden Code -->
+        <div id="stage2" class="stage">
+            <div class="receipt">
+                <h3>CORRUPTED DATA</h3>
+                <p>================================</p>
+                <div class="hidden-text" id="hiddenText">
+                    #@!%$^&*()_+}{":?><~`//\\|| Y0u 4r3 n0t supp0s3d t0 b3 h3r3... @#$%^&*()
+                </div>
+                <p>================================</p>
+                <p>Swipe or drag to reveal hidden message</p>
+            </div>
+            <button id="stage2Btn" disabled>Continue</button>
+        </div>
+        
+        <!-- Stage 3 - Endless Scroll -->
+        <div id="stage3" class="stage">
+            <div class="receipt">
+                <h3>SYSTEM STREAM</h3>
+                <p>================================</p>
+                <div class="scroll-container" id="endlessScroll">
+                    <!-- Content will be generated by JavaScript -->
+                </div>
+                <p>================================</p>
+            </div>
+            <div id="stage3Question" style="display: none;">
+                <p>Do you want to fix the receipt or let it glitch?</p>
+                <button id="fixBtn">Fix Receipt</button>
+                <button id="glitchBtn">Let It Glitch</button>
+            </div>
+        </div>
+        
+        <!-- Stage 4 - Glitch Portal Mini-Game -->
+        <div id="stage4" class="stage">
+            <h2 class="glitch" data-text="GLITCH PORTAL">GLITCH PORTAL</h2>
+            <div class="game-container" id="gameContainer">
+                <div class="score">Caught: <span id="score">0</span>/10</div>
+            </div>
+            <p>Catch the falling receipts to resolve the error</p>
+            <button id="stage4Btn" disabled>Continue</button>
+        </div>
+        
+        <!-- Stage 5 - System Repair Progress -->
+        <div id="stage5" class="stage">
+            <h2 class="flicker">SYSTEM REPAIR IN PROGRESS</h2>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <p class="status-text" id="statusText">Initializing repair sequence...</p>
+            <button id="stage5Btn" disabled>Continue</button>
+        </div>
+        
+        <!-- Final Stage - Redirect -->
+        <div id="finalStage" class="stage">
+            <div class="shredder">
+                <div class="shredded-paper"></div>
+            </div>
+            <h2 class="glitch" data-text="SYSTEM REBOOT COMPLETE">SYSTEM REBOOT COMPLETE</h2>
+            <p>Your true purchase has been processed.</p>
+            <p>Redirecting to secure portal...</p>
+        </div>
+    </div>
+
+    <script>
+        // Stage management
+        let currentStage = 0;
+        const totalStages = 6;
+        
+        // Move to next stage
+        function nextStage() {
+            document.getElementById(`stage${currentStage}`).classList.remove('active');
+            currentStage++;
+            
+            if (currentStage < totalStages) {
+                document.getElementById(`stage${currentStage}`).classList.add('active');
+                
+                // Initialize stage-specific functionality
+                initStage(currentStage);
+            } else {
+                // Final stage - redirect after delay
+                setTimeout(() => {
+                    window.location.href = 'https://NotTheBestPlaceToBuyStuff.in';
+                }, 3000);
+            }
+        }
+        
+        // Initialize stage-specific functionality
+        function initStage(stage) {
+            switch(stage) {
+                case 0:
+                    // Initial printer animation
+                    setTimeout(() => {
+                        document.querySelector('.paper').classList.add('printed');
+                    }, 500);
+                    break;
+                    
+                case 1:
+                    // Stage 1 - Overcharged items
+                    initStage1();
+                    break;
+                    
+                case 2:
+                    // Stage 2 - Hidden code
+                    initStage2();
+                    break;
+                    
+                case 3:
+                    // Stage 3 - Endless scroll
+                    initStage3();
+                    break;
+                    
+                case 4:
+                    // Stage 4 - Mini-game
+                    initStage4();
+                    break;
+                    
+                case 5:
+                    // Stage 5 - Progress bar
+                    initStage5();
+                    break;
+            }
+        }
+        
+        // Stage 1 functionality
+        function initStage1() {
+            const items = document.querySelectorAll('.receipt-item');
+            const continueBtn = document.getElementById('stage1Btn');
+            const message = document.getElementById('stage1Message');
+            let crossedOutCount = 0;
+            let fakeCrossedOut = 0;
+            
+            items.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (!item.classList.contains('crossed-out')) {
+                        item.classList.add('crossed-out');
+                        crossedOutCount++;
+                        
+                        if (item.dataset.fake === 'true') {
+                            fakeCrossedOut++;
+                        }
+                        
+                        // Check if conditions are met
+                        if (fakeCrossedOut >= 2) {
+                            continueBtn.disabled = false;
+                            message.textContent = "Correct! Proceeding to next stage...";
+                            
+                            // Add glitch effect
+                            document.querySelector('.receipt').classList.add('shake');
+                            setTimeout(() => {
+                                document.querySelector('.receipt').classList.remove('shake');
+                            }, 1000);
+                        } else if (crossedOutCount >= 2) {
+                            message.textContent = "Those aren't all fake charges. Try again!";
+                        }
+                    }
+                });
+            });
+            
+            continueBtn.addEventListener('click', nextStage);
+        }
+        
+        // Stage 2 functionality
+        function initStage2() {
+            const hiddenText = document.getElementById('hiddenText');
+            const continueBtn = document.getEleme
