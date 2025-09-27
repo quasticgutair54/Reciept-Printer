@@ -18,12 +18,27 @@
             font-family: 'Courier New', monospace;
             overflow-x: hidden;
             min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Background video */
+        #bgVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.3;
         }
         
         .container {
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
         
         /* Receipt styling */
@@ -245,6 +260,64 @@
             opacity: 1;
         }
         
+        /* Clickable receipt items */
+        .receipt-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .product-name {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .product-name:hover {
+            text-decoration: underline;
+        }
+        
+        .amount {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .amount:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Amount overlay */
+        .amount-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .amount-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .amount-text {
+            font-size: 2rem;
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            color: #000;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+        
         /* Stage 1 - Overcharged Items */
         .receipt-item {
             display: flex;
@@ -392,6 +465,20 @@
             100% { height: 0; }
         }
         
+        /* Download button */
+        .download-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 600px) {
             .container {
@@ -410,19 +497,36 @@
             .game-container {
                 height: 300px;
             }
+            
+            .amount-text {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Background Video -->
+    <video id="bgVideo" autoplay muted loop>
+        <source src="kolppdkdkd" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <!-- Amount Overlay -->
+    <div class="amount-overlay" id="amountOverlay">
+        <div class="amount-text" id="amountText"></div>
+    </div>
+    
+    <!-- Download Button -->
+    <div class="download-btn" id="downloadBtn" title="Download Receipt">↓</div>
+    
     <div class="container">
         <!-- Initial Stage - Printer Animation -->
         <div id="stage0" class="stage active">
             <h1 class="glitch flicker" data-text="Receipt Glitch Labyrinth">Receipt Glitch Labyrinth</h1>
             <div class="printer">
-                <div class="paper">
-                    <div class="paper-content">
-                        <p>⚠ SYSTEM ERROR: Handling Fee Not Found.</p>
-                        <p>Please verify your transaction.</p>
+                <div class="paper" id="printerPaper">
+                    <div class="paper-content" id="printedReceipt">
+                        <!-- Receipt content will be added by JavaScript -->
                     </div>
                 </div>
             </div>
@@ -527,7 +631,7 @@
             } else {
                 // Final stage - redirect after delay
                 setTimeout(() => {
-                    window.location.href = 'https://NotTheBestPlaceToBuyStuff.in';
+                    window.location.href = 'https://notthebestplacetobuystuff.in';
                 }, 3000);
             }
         }
@@ -537,9 +641,7 @@
             switch(stage) {
                 case 0:
                     // Initial printer animation
-                    setTimeout(() => {
-                        document.querySelector('.paper').classList.add('printed');
-                    }, 500);
+                    initStage0();
                     break;
                     
                 case 1:
@@ -568,6 +670,134 @@
                     break;
             }
         }
+        
+        // Stage 0 functionality - Printer animation with clickable items
+        function initStage0() {
+            const paper = document.getElementById('printerPaper');
+            const receiptContent = document.getElementById('printedReceipt');
+            const unrollBtn = document.getElementById('unrollBtn');
+            
+            // Receipt items with product names and amounts
+            const receiptItems = [
+                { product: "Digital Oxygen", amount: "₹499" },
+                { product: "Cloud Storage for Dreams", amount: "₹1,299" },
+                { product: "WiFi Signal Booster", amount: "₹799" },
+                { product: "Invisible Ink Cartridge", amount: "₹2,499" },
+                { product: "Time Travel Surcharge", amount: "₹9,999" },
+                { product: "Digital Footprint Cleaner", amount: "₹3,999" },
+                { product: "Privacy Tax", amount: "₹1,200" }
+            ];
+            
+            // Build receipt content with clickable elements
+            let receiptHTML = `
+                <h3>STORE RECEIPT</h3>
+                <p>================================</p>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>Time: ${new Date().toLocaleTimeString()}</p>
+                <p>================================</p>
+            `;
+            
+            receiptItems.forEach(item => {
+                receiptHTML += `
+                    <div class="receipt-line">
+                        <span class="product-name" data-product="${item.product}">${item.product}</span>
+                        <span class="amount" data-amount="${item.amount}">${item.amount}</span>
+                    </div>
+                `;
+            });
+            
+            receiptHTML += `
+                <p>================================</p>
+                <p>Total: ₹19,294</p>
+                <p>================================</p>
+                <p>Thank you for your purchase!</p>
+            `;
+            
+            // Animate printing
+            setTimeout(() => {
+                paper.classList.add('printed');
+                receiptContent.innerHTML = receiptHTML;
+                
+                // Add click handlers after content is visible
+                setTimeout(() => {
+                    // Product name click - redirect to About Us
+                    document.querySelectorAll('.product-name').forEach(element => {
+                        element.addEventListener('click', () => {
+                            window.location.href = 'https://notthebestplacetobuystuff.in/our-mission';
+                        });
+                    });
+                    
+                    // Amount click - show amount in words
+                    document.querySelectorAll('.amount').forEach(element => {
+                        element.addEventListener('click', () => {
+                            const amount = element.getAttribute('data-amount');
+                            const amountText = convertAmountToWords(amount);
+                            document.getElementById('amountText').textContent = amountText;
+                            document.getElementById('amountOverlay').classList.add('active');
+                            
+                            // Hide overlay after 3 seconds
+                            setTimeout(() => {
+                                document.getElementById('amountOverlay').classList.remove('active');
+                            }, 3000);
+                        });
+                    });
+                }, 1000);
+            }, 500);
+            
+            // Unroll button functionality
+            unrollBtn.addEventListener('click', nextStage);
+        }
+        
+        // Convert amount to words (simplified version)
+        function convertAmountToWords(amount) {
+            const amountNum = parseInt(amount.replace('₹', '').replace(',', ''));
+            
+            // Simple conversion for demo purposes
+            const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            
+            if (amountNum === 0) return 'Zero Rupees';
+            
+            let words = '';
+            
+            if (amountNum >= 1000) {
+                words += units[Math.floor(amountNum / 1000)] + ' Thousand ';
+                amountNum %= 1000;
+            }
+            
+            if (amountNum >= 100) {
+                words += units[Math.floor(amountNum / 100)] + ' Hundred ';
+                amountNum %= 100;
+            }
+            
+            if (amountNum >= 20) {
+                words += tens[Math.floor(amountNum / 10)] + ' ';
+                amountNum %= 10;
+            } else if (amountNum >= 10) {
+                words += teens[amountNum - 10] + ' ';
+                amountNum = 0;
+            }
+            
+            if (amountNum > 0) {
+                words += units[amountNum] + ' ';
+            }
+            
+            return words.trim() + ' Rupees';
+        }
+        
+        // Download receipt functionality
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            // Create a canvas to capture the receipt
+            const receipt = document.querySelector('.receipt') || document.getElementById('printedReceipt').parentElement;
+            html2canvas(receipt).then(canvas => {
+                // Convert canvas to image and trigger download
+                const link = document.createElement('a');
+                link.download = 'receipt.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        });
         
         // Stage 1 functionality
         function initStage1() {
@@ -610,4 +840,247 @@
         // Stage 2 functionality
         function initStage2() {
             const hiddenText = document.getElementById('hiddenText');
-            const continueBtn = document.getEleme
+            const continueBtn = document.getElementById('stage2Btn');
+            let isRevealed = false;
+            
+            // Mouse/touch events for revealing text
+            hiddenText.addEventListener('mousedown', startReveal);
+            hiddenText.addEventListener('touchstart', startReveal);
+            
+            function startReveal(e) {
+                if (isRevealed) return;
+                
+                e.preventDefault();
+                hiddenText.classList.add('revealed');
+                isRevealed = true;
+                
+                // Enable continue button after a delay
+                setTimeout(() => {
+                    continueBtn.disabled = false;
+                }, 1000);
+            }
+            
+            continueBtn.addEventListener('click', nextStage);
+        }
+        
+        // Stage 3 functionality
+        function initStage3() {
+            const scrollContainer = document.getElementById('endlessScroll');
+            const questionDiv = document.getElementById('stage3Question');
+            
+            // Generate random content for scrolling
+            const content = [
+                "ITEM: Digital Oxygen - ₹499",
+                "ITEM: Cloud Storage for Dreams - ₹1,299",
+                "ITEM: WiFi Signal Booster - ₹799",
+                "--------------------------------",
+                "ASCII ART:",
+                "  /\\_/\\",
+                " ( o.o )",
+                "  > ^ <",
+                "--------------------------------",
+                "MEME: One does not simply fix a glitched receipt",
+                "--------------------------------",
+                "ITEM: Invisible Ink Cartridge - ₹2,499",
+                "ITEM: Time Travel Surcharge - ₹9,999",
+                "--------------------------------",
+                "SYSTEM: Processing... Processing...",
+                "ERROR: Cannot compute meaning of life",
+                "--------------------------------",
+                "ITEM: Digital Footprint Cleaner - ₹3,999",
+                "ITEM: Privacy Tax - ₹1,200",
+                "--------------------------------",
+                "MEME: I came, I saw, I got confused by the receipt",
+                "--------------------------------",
+                "ASCII ART:",
+                "   _____",
+                "  /     \\",
+                " | () () |",
+                "  \\  ^  /",
+                "   |||||",
+                "--------------------------------"
+            ];
+            
+            // Fill the container with content
+            let fullContent = [];
+            for (let i = 0; i < 10; i++) {
+                fullContent = fullContent.concat(content);
+            }
+            
+            scrollContainer.innerHTML = fullContent.join('<br>');
+            
+            // Auto-scroll
+            let scrollPosition = 0;
+            const scrollInterval = setInterval(() => {
+                scrollPosition += 2;
+                scrollContainer.scrollTop = scrollPosition;
+                
+                // Stop after 20 seconds
+                if (scrollPosition > 5000) {
+                    clearInterval(scrollInterval);
+                    
+                    // Add glitch effect
+                    scrollContainer.innerHTML = "SYSTEM GLITCH DETECTED<br>=====================<br>ERROR: STREAM CORRUPTED";
+                    scrollContainer.classList.add('glitch');
+                    
+                    // Show question
+                    setTimeout(() => {
+                        questionDiv.style.display = 'block';
+                    }, 1000);
+                }
+            }, 50);
+            
+            // Button handlers
+            document.getElementById('fixBtn').addEventListener('click', nextStage);
+            document.getElementById('glitchBtn').addEventListener('click', nextStage);
+        }
+        
+        // Stage 4 functionality
+        function initStage4() {
+            const gameContainer = document.getElementById('gameContainer');
+            const scoreElement = document.getElementById('score');
+            const continueBtn = document.getElementById('stage4Btn');
+            let score = 0;
+            let receipts = [];
+            
+            // Receipt labels
+            const receiptLabels = [
+                "Drip Insurance - ₹9999",
+                "Handling Fee of Happiness - ₹420",
+                "Air Tax - ₹299",
+                "Digital Soul - ₹7,777",
+                "WiFi Aura - ₹1,234",
+                "Cloud Emotions - ₹5,555",
+                "Virtual Reality Surcharge - ₹3,333",
+                "Data Detox - ₹6,666",
+                "Dream Storage - ₹8,888",
+                "Time Compression - ₹9,999",
+                "Reality Glitch Fix - ₹4,444",
+                "Existence Verification - ₹2,222"
+            ];
+            
+            // Create falling receipts
+            function createReceipt() {
+                if (score >= 10) return;
+                
+                const receipt = document.createElement('div');
+                receipt.className = 'falling-receipt';
+                receipt.textContent = receiptLabels[Math.floor(Math.random() * receiptLabels.length)];
+                
+                // Random position
+                const leftPos = Math.random() * (gameContainer.offsetWidth - 100);
+                receipt.style.left = `${leftPos}px`;
+                receipt.style.top = '-50px';
+                
+                // Add to container
+                gameContainer.appendChild(receipt);
+                receipts.push(receipt);
+                
+                // Falling animation
+                let topPos = -50;
+                const fallInterval = setInterval(() => {
+                    topPos += 3;
+                    receipt.style.top = `${topPos}px`;
+                    
+                    // Remove if out of bounds
+                    if (topPos > gameContainer.offsetHeight) {
+                        clearInterval(fallInterval);
+                        gameContainer.removeChild(receipt);
+                        receipts = receipts.filter(r => r !== receipt);
+                    }
+                }, 50);
+                
+                // Click/tap to catch
+                receipt.addEventListener('click', () => {
+                    if (receipt.classList.contains('caught')) return;
+                    
+                    receipt.classList.add('caught');
+                    score++;
+                    scoreElement.textContent = score;
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        if (gameContainer.contains(receipt)) {
+                            gameContainer.removeChild(receipt);
+                        }
+                        receipts = receipts.filter(r => r !== receipt);
+                    }, 500);
+                    
+                    // Check if game is complete
+                    if (score >= 10) {
+                        continueBtn.disabled = false;
+                    }
+                });
+                
+                // Create next receipt after random delay
+                setTimeout(createReceipt, Math.random() * 1000 + 500);
+            }
+            
+            // Start creating receipts
+            createReceipt();
+            
+            continueBtn.addEventListener('click', nextStage);
+        }
+        
+        // Stage 5 functionality
+        function initStage5() {
+            const progressBar = document.getElementById('progressBar');
+            const statusText = document.getElementById('statusText');
+            const continueBtn = document.getElementById('stage5Btn');
+            
+            // Status messages
+            const statusMessages = [
+                "Initializing repair sequence...",
+                "Calibrating your wardrobe taste...",
+                "Counting how many times you've said 'Almost but nope'...",
+                "Encrypting your drip...",
+                "Optimizing life choices...",
+                "Defragmenting reality...",
+                "Rebooting existential crisis...",
+                "Recalculating life's meaning...",
+                "Downloading more RAM...",
+                "Polishing digital aura...",
+                "Finalizing system integrity..."
+            ];
+            
+            let progress = 0;
+            const totalTime = 240000; // 4 minutes in milliseconds
+            const intervalTime = 100; // Update every 100ms
+            const increments = totalTime / intervalTime;
+            const progressIncrement = 100 / increments;
+            let messageIndex = 0;
+            
+            const progressInterval = setInterval(() => {
+                progress += progressIncrement;
+                progressBar.style.width = `${progress}%`;
+                progressBar.textContent = `${Math.round(progress)}%`;
+                
+                // Update status text at certain intervals
+                if (progress % 10 < progressIncrement) {
+                    messageIndex = Math.min(messageIndex + 1, statusMessages.length - 1);
+                    statusText.textContent = statusMessages[messageIndex];
+                }
+                
+                // Complete when progress reaches 100%
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    progressBar.textContent = "100%";
+                    statusText.textContent = "System repair complete!";
+                    continueBtn.disabled = false;
+                }
+            }, intervalTime);
+            
+            continueBtn.addEventListener('click', nextStage);
+        }
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start with stage 0
+            initStage(0);
+        });
+    </script>
+    
+    <!-- html2canvas library for receipt download -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+</html>
