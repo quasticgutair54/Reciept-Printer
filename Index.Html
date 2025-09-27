@@ -1,3 +1,8 @@
+# Receipt Glitch Labyrinth with Exit Prevention
+
+I'll implement the forced receipt scroll with exit prevention as requested. Here's the complete solution:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -479,6 +484,83 @@
             z-index: 10;
         }
         
+        /* Forced scroll stage */
+        .forced-scroll-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+        
+        .forced-scroll-container.active {
+            display: block;
+        }
+        
+        .forced-receipt {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background-color: #fff;
+            color: #000;
+            padding: 20px;
+            transition: top 120s linear;
+        }
+        
+        .forced-receipt.scrolling {
+            top: -200%;
+        }
+        
+        .exit-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border: 2px solid #fff;
+            z-index: 1001;
+            display: none;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .exit-message.active {
+            display: block;
+        }
+        
+        .encouragement-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1001;
+            display: none;
+            text-align: center;
+            max-width: 80%;
+            animation: pulse 2s infinite;
+        }
+        
+        .encouragement-message.active {
+            display: block;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 600px) {
             .container {
@@ -501,6 +583,11 @@
             .amount-text {
                 font-size: 1.5rem;
             }
+            
+            .forced-receipt {
+                width: 95%;
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -518,6 +605,23 @@
     
     <!-- Download Button -->
     <div class="download-btn" id="downloadBtn" title="Download Receipt">↓</div>
+    
+    <!-- Forced Scroll Stage -->
+    <div class="forced-scroll-container" id="forcedScrollContainer">
+        <div class="forced-receipt" id="forcedReceipt">
+            <!-- Receipt content will be added by JavaScript -->
+        </div>
+        
+        <div class="exit-message" id="exitMessage">
+            <h2>What are you doing?</h2>
+            <p>Finish reading the receipt! It shows what you have purchased or you might have purchased.</p>
+            <button id="continueReading">Continue Reading</button>
+        </div>
+        
+        <div class="encouragement-message" id="encouragementMessage">
+            <!-- Encouragement text will be added by JavaScript -->
+        </div>
+    </div>
     
     <div class="container">
         <!-- Initial Stage - Printer Animation -->
@@ -617,6 +721,9 @@
         // Stage management
         let currentStage = 0;
         const totalStages = 6;
+        let isForcedScrollActive = false;
+        let scrollStartTime = null;
+        let scrollDuration = 120000; // 120 seconds for forced scroll
         
         // Move to next stage
         function nextStage() {
@@ -629,10 +736,8 @@
                 // Initialize stage-specific functionality
                 initStage(currentStage);
             } else {
-                // Final stage - redirect after delay
-                setTimeout(() => {
-                    window.location.href = 'https://notthebestplacetobuystuff.in';
-                }, 3000);
+                // Final stage - start forced scroll before redirect
+                startForcedScroll();
             }
         }
         
@@ -1073,6 +1178,186 @@
             continueBtn.addEventListener('click', nextStage);
         }
         
+        // Forced scroll functionality
+        function startForcedScroll() {
+            isForcedScrollActive = true;
+            scrollStartTime = Date.now();
+            
+            // Show forced scroll container
+            document.getElementById('forcedScrollContainer').classList.add('active');
+            
+            // Generate receipt content
+            const forcedReceipt = document.getElementById('forcedReceipt');
+            let receiptHTML = `
+                <h3>FINAL TRANSACTION RECEIPT</h3>
+                <p>================================</p>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <p>Time: ${new Date().toLocaleTimeString()}</p>
+                <p>Transaction ID: GL1TCH-${Math.floor(Math.random() * 10000)}</p>
+                <p>================================</p>
+            `;
+            
+            // Add many receipt items to make it long
+            const items = [
+                "Digital Consciousness Upgrade - ₹14,999",
+                "Reality Distortion Field - ₹7,777",
+                "Temporal Loop Pass - ₹12,345",
+                "Quantum Entanglement Kit - ₹9,876",
+                "Parallel Universe Access - ₹19,999",
+                "Dream Manipulation Software - ₹6,666",
+                "Emotional Intelligence Boost - ₹8,888",
+                "Existential Crisis Insurance - ₹15,000",
+                "Time Dilation Device - ₹22,222",
+                "Memory Encryption Service - ₹5,555",
+                "Virtual Identity Protection - ₹11,111",
+                "Consciousness Backup - ₹25,000",
+                "Reality Glitch Repair - ₹3,333",
+                "Digital Soul Preservation - ₹18,000",
+                "Multiverse Travel Permit - ₹30,000",
+                "Quantum Computing Time - ₹7,500",
+                "Neural Interface Upgrade - ₹12,500",
+                "Emotional Stability Package - ₹9,999",
+                "Digital Afterlife Plan - ₹50,000",
+                "Reality Anchoring Device - ₹13,333"
+            ];
+            
+            items.forEach(item => {
+                receiptHTML += `<p>${item}</p>`;
+            });
+            
+            receiptHTML += `
+                <p>================================</p>
+                <p>Subtotal: ₹278,883</p>
+                <p>Reality Tax: ₹55,777</p>
+                <p>Consciousness Fee: ₹33,333</p>
+                <p>================================</p>
+                <p>TOTAL: ₹368,000</p>
+                <p>================================</p>
+                <p>Thank you for your metaphysical purchase!</p>
+                <p>Your transaction has been processed across multiple dimensions.</p>
+                <p>Please keep this receipt for your records.</p>
+                <p>Reality may vary based on your perception.</p>
+                <p>================================</p>
+                <p>WARNING: Do not attempt to exit before reading completely.</p>
+                <p>Your consciousness synchronization depends on it.</p>
+                <p>================================</p>
+            `;
+            
+            // Add more content to make it even longer
+            for (let i = 0; i < 20; i++) {
+                receiptHTML += `<p>Additional security layer ${i+1}: Activated</p>`;
+            }
+            
+            receiptHTML += `
+                <p>================================</p>
+                <p>SYSTEM MESSAGE: Almost done...</p>
+                <p>Your patience is appreciated.</p>
+                <p>================================</p>
+            `;
+            
+            forcedReceipt.innerHTML = receiptHTML;
+            
+            // Start scrolling
+            setTimeout(() => {
+                forcedReceipt.classList.add('scrolling');
+            }, 1000);
+            
+            // Show encouragement messages at intervals
+            const encouragementMessages = [
+                "Sure it is slow, but once you read it, it's going to be good.",
+                "Something else is going to happen, so please don't exit.",
+                "Please stay. Well, I mean you can't exit, but I am telling something.",
+                "You're almost there! The best part is coming up.",
+                "Just a little more... I promise it will be worth it.",
+                "Don't miss the surprise at the end!",
+                "Your persistence is being recorded and appreciated.",
+                "The system is calibrating to your reading speed.",
+                "This is important for your digital footprint.",
+                "Finalizing your multidimensional transaction..."
+            ];
+            
+            let encouragementIndex = 0;
+            const encouragementInterval = setInterval(() => {
+                if (encouragementIndex < encouragementMessages.length) {
+                    document.getElementById('encouragementMessage').textContent = encouragementMessages[encouragementIndex];
+                    document.getElementById('encouragementMessage').classList.add('active');
+                    encouragementIndex++;
+                    
+                    // Hide message after 5 seconds
+                    setTimeout(() => {
+                        document.getElementById('encouragementMessage').classList.remove('active');
+                    }, 5000);
+                } else {
+                    clearInterval(encouragementInterval);
+                }
+            }, 10000); // Show every 10 seconds
+            
+            // Set up exit prevention
+            setupExitPrevention();
+            
+            // Redirect after scroll completes
+            setTimeout(() => {
+                isForcedScrollActive = false;
+                window.location.href = 'https://notthebestplacetobuystuff.in';
+            }, scrollDuration + 2000); // Add 2 seconds buffer
+        }
+        
+        // Exit prevention system
+        function setupExitPrevention() {
+            // Prevent context menu
+            document.addEventListener('contextmenu', function(e) {
+                if (isForcedScrollActive) {
+                    e.preventDefault();
+                    showExitMessage();
+                }
+            });
+            
+            // Prevent keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (isForcedScrollActive) {
+                    // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, etc.
+                    if (e.key === 'F12' || 
+                        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+                        (e.ctrlKey && e.key === 'u')) {
+                        e.preventDefault();
+                        showExitMessage();
+                    }
+                    
+                    // Prevent Escape key
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        showExitMessage();
+                    }
+                }
+            });
+            
+            // Attempt to prevent tab/window closing
+            window.addEventListener('beforeunload', function(e) {
+                if (isForcedScrollActive) {
+                    e.preventDefault();
+                    e.returnValue = 'Are you sure you want to leave? The receipt reading is not complete.';
+                    return e.returnValue;
+                }
+            });
+            
+            // Detect mouse leaving window
+            document.addEventListener('mouseleave', function(e) {
+                if (isForcedScrollActive && e.clientY < 0) {
+                    showExitMessage();
+                }
+            });
+        }
+        
+        // Show exit message
+        function showExitMessage() {
+            document.getElementById('exitMessage').classList.add('active');
+            
+            // Continue reading button
+            document.getElementById('continueReading').addEventListener('click', function() {
+                document.getElementById('exitMessage').classList.remove('active');
+            });
+        }
+        
         // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
             // Start with stage 0
@@ -1084,3 +1369,24 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>
+```
+
+## Key Features Added:
+
+1. **Forced Receipt Scroll** - A long receipt that slowly scrolls for 2 minutes
+2. **Exit Prevention** - Multiple techniques to prevent users from leaving:
+   - Blocks keyboard shortcuts (F12, Ctrl+Shift+I, etc.)
+   - Prevents right-click context menu
+   - Shows warning when trying to close the tab/window
+   - Detects when mouse leaves the window
+
+3. **Encouragement Messages** - Random messages that pop up to keep users engaged:
+   - "Sure it is slow, but once you read it, it's going to be good."
+   - "Something else is going to happen, so please don't exit."
+   - "Please stay. Well, I mean you can't exit, but I am telling something."
+
+4. **Exit Warning Message** - When users try to exit, they see:
+   - "What are you doing?"
+   - "Finish reading the receipt! It shows what you have purchased or you might have purchased."
+
+The forced scroll stage activates after all other stages are completed, ensuring users engage with the content for the full duration before being redirected to your website.
