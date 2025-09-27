@@ -479,6 +479,24 @@
             z-index: 10;
         }
         
+        /* Audio controls */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+        
+        .audio-btn {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
         /* Forced scroll stage */
         .forced-scroll-container {
             position: fixed;
@@ -513,47 +531,34 @@
             top: -200%;
         }
         
-        .exit-message {
+        /* Glowing text messages */
+        .glowing-text {
             position: fixed;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.9);
-            padding: 20px;
-            border: 2px solid #fff;
-            z-index: 1001;
-            display: none;
-            text-align: center;
-            max-width: 80%;
-        }
-        
-        .exit-message.active {
-            display: block;
-        }
-        
-        .encouragement-message {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 10px 20px;
+            right: 5%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
             border-radius: 5px;
             z-index: 1001;
             display: none;
+            max-width: 250px;
             text-align: center;
-            max-width: 80%;
-            animation: pulse 2s infinite;
+            animation: glow 2s infinite alternate;
+            border: 1px solid #fff;
         }
         
-        .encouragement-message.active {
+        .glowing-text.active {
             display: block;
         }
         
-        @keyframes pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; }
-            100% { opacity: 0.7; }
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ff, 0 0 20px #0ff;
+            }
+            to {
+                box-shadow: 0 0 10px #fff, 0 0 15px #0ff, 0 0 20px #0ff, 0 0 25px #0ff;
+            }
         }
         
         /* Responsive adjustments */
@@ -579,58 +584,77 @@
                 font-size: 1.5rem;
             }
             
+            .audio-controls {
+                bottom: 10px;
+                left: 10px;
+            }
+            
             .forced-receipt {
                 width: 95%;
                 padding: 15px;
+            }
+            
+            .glowing-text {
+                right: 2%;
+                max-width: 200px;
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
 <body>
-    <audio id="backgroundMusic" loop>
-        <source src="stormy_weather.mp3" type="audio/mpeg">
-        Your browser does not support the audio tag.
-    </audio>
-
-    <button id="startButton" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1001; padding: 20px; font-size: 1.2rem;">Click to Begin</button>
-
+    <!-- Background Video -->
     <video id="bgVideo" autoplay muted loop>
         <source src="kolppdkdkd" type="video/mp4">
         Your browser does not support the video tag.
     </video>
     
+    <!-- Background Audio -->
+    <audio id="bgAudio" loop>
+        <source src="stormy_weather.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <!-- Audio Controls -->
+    <div class="audio-controls">
+        <button class="audio-btn" id="audioToggle">🔊</button>
+    </div>
+    
+    <!-- Amount Overlay -->
     <div class="amount-overlay" id="amountOverlay">
         <div class="amount-text" id="amountText"></div>
     </div>
     
+    <!-- Download Button -->
     <div class="download-btn" id="downloadBtn" title="Download Receipt">↓</div>
     
+    <!-- Forced Scroll Stage -->
     <div class="forced-scroll-container" id="forcedScrollContainer">
         <div class="forced-receipt" id="forcedReceipt">
-            </div>
-        
-        <div class="exit-message" id="exitMessage">
-            <h2>What are you doing?</h2>
-            <p>Finish reading the receipt! It shows what you have purchased or you might have purchased.</p>
-            <button id="continueReading">Continue Reading</button>
+            <!-- Receipt content will be added by JavaScript -->
         </div>
         
-        <div class="encouragement-message" id="encouragementMessage">
-            </div>
+        <!-- Glowing text messages -->
+        <div class="glowing-text" id="glowingText">
+            <!-- Text will be added by JavaScript -->
+        </div>
     </div>
     
     <div class="container">
+        <!-- Initial Stage - Printer Animation -->
         <div id="stage0" class="stage active">
             <h1 class="glitch flicker" data-text="Receipt Glitch Labyrinth">Receipt Glitch Labyrinth</h1>
             <div class="printer">
                 <div class="paper" id="printerPaper">
                     <div class="paper-content" id="printedReceipt">
-                        </div>
+                        <!-- Receipt content will be added by JavaScript -->
+                    </div>
                 </div>
             </div>
             <button id="unrollBtn">Unroll Receipt</button>
         </div>
         
+        <!-- Stage 1 - Overcharged Items Riddle -->
         <div id="stage1" class="stage">
             <div class="receipt">
                 <h3>STORE RECEIPT</h3>
@@ -648,6 +672,7 @@
             <button id="stage1Btn" disabled>Continue</button>
         </div>
         
+        <!-- Stage 2 - Hidden Code -->
         <div id="stage2" class="stage">
             <div class="receipt">
                 <h3>CORRUPTED DATA</h3>
@@ -661,12 +686,14 @@
             <button id="stage2Btn" disabled>Continue</button>
         </div>
         
+        <!-- Stage 3 - Endless Scroll -->
         <div id="stage3" class="stage">
             <div class="receipt">
                 <h3>SYSTEM STREAM</h3>
                 <p>================================</p>
                 <div class="scroll-container" id="endlessScroll">
-                    </div>
+                    <!-- Content will be generated by JavaScript -->
+                </div>
                 <p>================================</p>
             </div>
             <div id="stage3Question" style="display: none;">
@@ -676,6 +703,7 @@
             </div>
         </div>
         
+        <!-- Stage 4 - Glitch Portal Mini-Game -->
         <div id="stage4" class="stage">
             <h2 class="glitch" data-text="GLITCH PORTAL">GLITCH PORTAL</h2>
             <div class="game-container" id="gameContainer">
@@ -685,6 +713,7 @@
             <button id="stage4Btn" disabled>Continue</button>
         </div>
         
+        <!-- Stage 5 - System Repair Progress -->
         <div id="stage5" class="stage">
             <h2 class="flicker">SYSTEM REPAIR IN PROGRESS</h2>
             <div class="progress-container">
@@ -694,6 +723,7 @@
             <button id="stage5Btn" disabled>Continue</button>
         </div>
         
+        <!-- Final Stage - Redirect -->
         <div id="finalStage" class="stage">
             <div class="shredder">
                 <div class="shredded-paper"></div>
@@ -705,21 +735,48 @@
     </div>
 
     <script>
-        // NEW: JAVASCRIPT FOR THE START BUTTON
-        const music = document.getElementById('backgroundMusic');
-        const startButton = document.getElementById('startButton');
-
-        startButton.addEventListener('click', () => {
-            music.play();
-            startButton.style.display = 'none'; // Hide the button after it's clicked
-        });
-
         // Stage management
         let currentStage = 0;
         const totalStages = 6;
         let isForcedScrollActive = false;
         let scrollStartTime = null;
         let scrollDuration = 120000; // 120 seconds for forced scroll
+        
+        // Audio management
+        const bgAudio = document.getElementById('bgAudio');
+        const audioToggle = document.getElementById('audioToggle');
+        let isAudioPlaying = false;
+        
+        // Initialize audio
+        function initAudio() {
+            // Try to play audio (will work after user interaction)
+            try {
+                bgAudio.volume = 0.3;
+                bgAudio.play().then(() => {
+                    isAudioPlaying = true;
+                    audioToggle.textContent = "🔊";
+                }).catch(() => {
+                    isAudioPlaying = false;
+                    audioToggle.textContent = "🔇";
+                });
+            } catch (e) {
+                console.log("Audio error:", e);
+            }
+            
+            // Audio toggle button
+            audioToggle.addEventListener('click', function() {
+                if (isAudioPlaying) {
+                    bgAudio.pause();
+                    isAudioPlaying = false;
+                    audioToggle.textContent = "🔇";
+                } else {
+                    bgAudio.play().then(() => {
+                        isAudioPlaying = true;
+                        audioToggle.textContent = "🔊";
+                    });
+                }
+            });
+        }
         
         // Move to next stage
         function nextStage() {
@@ -778,6 +835,7 @@
             const receiptContent = document.getElementById('printedReceipt');
             const unrollBtn = document.getElementById('unrollBtn');
             
+            // Receipt items with product names and amounts
             const receiptItems = [
                 { product: "Digital Oxygen", amount: "₹499" },
                 { product: "Cloud Storage for Dreams", amount: "₹1,299" },
@@ -788,6 +846,7 @@
                 { product: "Privacy Tax", amount: "₹1,200" }
             ];
             
+            // Build receipt content with clickable elements
             let receiptHTML = `
                 <h3>STORE RECEIPT</h3>
                 <p>================================</p>
@@ -812,25 +871,29 @@
                 <p>Thank you for your purchase!</p>
             `;
             
+            // Animate printing
             setTimeout(() => {
                 paper.classList.add('printed');
                 receiptContent.innerHTML = receiptHTML;
                 
+                // Add click handlers after content is visible
                 setTimeout(() => {
-                    // FIXED: Scoped selectors to #stage0
-                    document.querySelectorAll('#stage0 .product-name').forEach(element => {
+                    // Product name click - redirect to About Us
+                    document.querySelectorAll('.product-name').forEach(element => {
                         element.addEventListener('click', () => {
                             window.location.href = 'https://notthebestplacetobuystuff.in/our-mission';
                         });
                     });
                     
-                    document.querySelectorAll('#stage0 .amount').forEach(element => {
+                    // Amount click - show amount in words
+                    document.querySelectorAll('.amount').forEach(element => {
                         element.addEventListener('click', () => {
                             const amount = element.getAttribute('data-amount');
                             const amountText = convertAmountToWords(amount);
                             document.getElementById('amountText').textContent = amountText;
                             document.getElementById('amountOverlay').classList.add('active');
                             
+                            // Hide overlay after 3 seconds
                             setTimeout(() => {
                                 document.getElementById('amountOverlay').classList.remove('active');
                             }, 3000);
@@ -839,25 +902,33 @@
                 }, 1000);
             }, 500);
             
+            // Unroll button functionality
             unrollBtn.addEventListener('click', nextStage);
         }
         
         // Convert amount to words (simplified version)
         function convertAmountToWords(amount) {
             const amountNum = parseInt(amount.replace('₹', '').replace(',', ''));
+            
+            // Simple conversion for demo purposes
             const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
             const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
             const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            
             if (amountNum === 0) return 'Zero Rupees';
+            
             let words = '';
+            
             if (amountNum >= 1000) {
                 words += units[Math.floor(amountNum / 1000)] + ' Thousand ';
                 amountNum %= 1000;
             }
+            
             if (amountNum >= 100) {
                 words += units[Math.floor(amountNum / 100)] + ' Hundred ';
                 amountNum %= 100;
             }
+            
             if (amountNum >= 20) {
                 words += tens[Math.floor(amountNum / 10)] + ' ';
                 amountNum %= 10;
@@ -865,15 +936,20 @@
                 words += teens[amountNum - 10] + ' ';
                 amountNum = 0;
             }
+            
             if (amountNum > 0) {
                 words += units[amountNum] + ' ';
             }
+            
             return words.trim() + ' Rupees';
         }
         
+        // Download receipt functionality
         document.getElementById('downloadBtn').addEventListener('click', function() {
-            const receipt = document.querySelector('.receipt.active') || document.getElementById('printedReceipt').parentElement;
+            // Create a canvas to capture the receipt
+            const receipt = document.querySelector('.receipt') || document.getElementById('printedReceipt').parentElement;
             html2canvas(receipt).then(canvas => {
+                // Convert canvas to image and trigger download
                 const link = document.createElement('a');
                 link.download = 'receipt.png';
                 link.href = canvas.toDataURL();
@@ -883,8 +959,7 @@
         
         // Stage 1 functionality
         function initStage1() {
-            // FIXED: Scoped selector to #stage1
-            const items = document.querySelectorAll('#stage1 .receipt-item');
+            const items = document.querySelectorAll('.receipt-item');
             const continueBtn = document.getElementById('stage1Btn');
             const message = document.getElementById('stage1Message');
             let crossedOutCount = 0;
@@ -900,13 +975,15 @@
                             fakeCrossedOut++;
                         }
                         
+                        // Check if conditions are met
                         if (fakeCrossedOut >= 2) {
                             continueBtn.disabled = false;
                             message.textContent = "Correct! Proceeding to next stage...";
-                            // FIXED: Scoped selector to #stage1
-                            document.querySelector('#stage1 .receipt').classList.add('shake');
+                            
+                            // Add glitch effect
+                            document.querySelector('.receipt').classList.add('shake');
                             setTimeout(() => {
-                                document.querySelector('#stage1 .receipt').classList.remove('shake');
+                                document.querySelector('.receipt').classList.remove('shake');
                             }, 1000);
                         } else if (crossedOutCount >= 2) {
                             message.textContent = "Those aren't all fake charges. Try again!";
@@ -924,18 +1001,23 @@
             const continueBtn = document.getElementById('stage2Btn');
             let isRevealed = false;
             
+            // Mouse/touch events for revealing text
+            hiddenText.addEventListener('mousedown', startReveal);
+            hiddenText.addEventListener('touchstart', startReveal);
+            
             function startReveal(e) {
                 if (isRevealed) return;
+                
                 e.preventDefault();
                 hiddenText.classList.add('revealed');
                 isRevealed = true;
+                
+                // Enable continue button after a delay
                 setTimeout(() => {
                     continueBtn.disabled = false;
                 }, 1000);
             }
-
-            hiddenText.addEventListener('mousedown', startReveal);
-            hiddenText.addEventListener('touchstart', startReveal);
+            
             continueBtn.addEventListener('click', nextStage);
         }
         
@@ -944,29 +1026,69 @@
             const scrollContainer = document.getElementById('endlessScroll');
             const questionDiv = document.getElementById('stage3Question');
             
-            const content = [ "ITEM: Digital Oxygen - ₹499", "ITEM: Cloud Storage for Dreams - ₹1,299", "ITEM: WiFi Signal Booster - ₹799", "--------------------------------", "ASCII ART:", "  /\\_/\\", " ( o.o )", "  > ^ <", "--------------------------------", "MEME: One does not simply fix a glitched receipt", "--------------------------------", "ITEM: Invisible Ink Cartridge - ₹2,499", "ITEM: Time Travel Surcharge - ₹9,999", "--------------------------------", "SYSTEM: Processing... Processing...", "ERROR: Cannot compute meaning of life", "--------------------------------", "ITEM: Digital Footprint Cleaner - ₹3,999", "ITEM: Privacy Tax - ₹1,200", "--------------------------------", "MEME: I came, I saw, I got confused by the receipt", "--------------------------------", "ASCII ART:", "    _____", "  /     \\", " | () () |", "  \\  ^  /", "   |||||", "--------------------------------" ];
+            // Generate random content for scrolling
+            const content = [
+                "ITEM: Digital Oxygen - ₹499",
+                "ITEM: Cloud Storage for Dreams - ₹1,299",
+                "ITEM: WiFi Signal Booster - ₹799",
+                "--------------------------------",
+                "ASCII ART:",
+                "  /\\_/\\",
+                " ( o.o )",
+                "  > ^ <",
+                "--------------------------------",
+                "MEME: One does not simply fix a glitched receipt",
+                "--------------------------------",
+                "ITEM: Invisible Ink Cartridge - ₹2,499",
+                "ITEM: Time Travel Surcharge - ₹9,999",
+                "--------------------------------",
+                "SYSTEM: Processing... Processing...",
+                "ERROR: Cannot compute meaning of life",
+                "--------------------------------",
+                "ITEM: Digital Footprint Cleaner - ₹3,999",
+                "ITEM: Privacy Tax - ₹1,200",
+                "--------------------------------",
+                "MEME: I came, I saw, I got confused by the receipt",
+                "--------------------------------",
+                "ASCII ART:",
+                "   _____",
+                "  /     \\",
+                " | () () |",
+                "  \\  ^  /",
+                "   |||||",
+                "--------------------------------"
+            ];
+            
+            // Fill the container with content
             let fullContent = [];
             for (let i = 0; i < 10; i++) {
                 fullContent = fullContent.concat(content);
             }
+            
             scrollContainer.innerHTML = fullContent.join('<br>');
             
+            // Auto-scroll
             let scrollPosition = 0;
             const scrollInterval = setInterval(() => {
                 scrollPosition += 2;
                 scrollContainer.scrollTop = scrollPosition;
                 
-                // FIXED: Changed duration to be closer to 20 seconds
-                if (scrollPosition > 1000) { // Approx 25 seconds
+                // Stop after 20 seconds
+                if (scrollPosition > 5000) {
                     clearInterval(scrollInterval);
+                    
+                    // Add glitch effect
                     scrollContainer.innerHTML = "SYSTEM GLITCH DETECTED<br>=====================<br>ERROR: STREAM CORRUPTED";
                     scrollContainer.classList.add('glitch');
+                    
+                    // Show question
                     setTimeout(() => {
                         questionDiv.style.display = 'block';
                     }, 1000);
                 }
             }, 50);
             
+            // Button handlers
             document.getElementById('fixBtn').addEventListener('click', nextStage);
             document.getElementById('glitchBtn').addEventListener('click', nextStage);
         }
@@ -977,55 +1099,84 @@
             const scoreElement = document.getElementById('score');
             const continueBtn = document.getElementById('stage4Btn');
             let score = 0;
-            let gameInterval;
-
-            const receiptLabels = [ "Drip Insurance - ₹9999", "Handling Fee of Happiness - ₹420", "Air Tax - ₹299", "Digital Soul - ₹7,777", "WiFi Aura - ₹1,234", "Cloud Emotions - ₹5,555", "Virtual Reality Surcharge - ₹3,333", "Data Detox - ₹6,666", "Dream Storage - ₹8,888", "Time Compression - ₹9,999", "Reality Glitch Fix - ₹4,444", "Existence Verification - ₹2,222" ];
+            let receipts = [];
             
+            // Receipt labels
+            const receiptLabels = [
+                "Drip Insurance - ₹9999",
+                "Handling Fee of Happiness - ₹420",
+                "Air Tax - ₹299",
+                "Digital Soul - ₹7,777",
+                "WiFi Aura - ₹1,234",
+                "Cloud Emotions - ₹5,555",
+                "Virtual Reality Surcharge - ₹3,333",
+                "Data Detox - ₹6,666",
+                "Dream Storage - ₹8,888",
+                "Time Compression - ₹9,999",
+                "Reality Glitch Fix - ₹4,444",
+                "Existence Verification - ₹2,222"
+            ];
+            
+            // Create falling receipts
             function createReceipt() {
-                if (score >= 10) {
-                    clearInterval(gameInterval);
-                    return;
-                };
+                if (score >= 10) return;
                 
                 const receipt = document.createElement('div');
                 receipt.className = 'falling-receipt';
                 receipt.textContent = receiptLabels[Math.floor(Math.random() * receiptLabels.length)];
                 
-                const leftPos = Math.random() * (gameContainer.offsetWidth - 150); // Adjust for receipt width
+                // Random position
+                const leftPos = Math.random() * (gameContainer.offsetWidth - 100);
                 receipt.style.left = `${leftPos}px`;
                 receipt.style.top = '-50px';
-                gameContainer.appendChild(receipt);
                 
+                // Add to container
+                gameContainer.appendChild(receipt);
+                receipts.push(receipt);
+                
+                // Falling animation
                 let topPos = -50;
                 const fallInterval = setInterval(() => {
                     topPos += 3;
                     receipt.style.top = `${topPos}px`;
+                    
+                    // Remove if out of bounds
                     if (topPos > gameContainer.offsetHeight) {
                         clearInterval(fallInterval);
-                        if (gameContainer.contains(receipt)) {
-                           gameContainer.removeChild(receipt);
-                        }
+                        gameContainer.removeChild(receipt);
+                        receipts = receipts.filter(r => r !== receipt);
                     }
                 }, 50);
                 
+                // Click/tap to catch
                 receipt.addEventListener('click', () => {
                     if (receipt.classList.contains('caught')) return;
+                    
                     receipt.classList.add('caught');
                     score++;
                     scoreElement.textContent = score;
-                    if (score >= 10) {
-                        continueBtn.disabled = false;
-                        clearInterval(gameInterval); // Stop new receipts from appearing
-                    }
+                    
+                    // Remove after animation
                     setTimeout(() => {
                         if (gameContainer.contains(receipt)) {
                             gameContainer.removeChild(receipt);
                         }
+                        receipts = receipts.filter(r => r !== receipt);
                     }, 500);
+                    
+                    // Check if game is complete
+                    if (score >= 10) {
+                        continueBtn.disabled = false;
+                    }
                 });
+                
+                // Create next receipt after random delay
+                setTimeout(createReceipt, Math.random() * 1000 + 500);
             }
             
-            gameInterval = setInterval(createReceipt, 800); // Create a receipt every 0.8 seconds
+            // Start creating receipts
+            createReceipt();
+            
             continueBtn.addEventListener('click', nextStage);
         }
         
@@ -1035,28 +1186,40 @@
             const statusText = document.getElementById('statusText');
             const continueBtn = document.getElementById('stage5Btn');
             
-            const statusMessages = [ "Initializing repair sequence...", "Calibrating your wardrobe taste...", "Counting how many times you've said 'Almost but nope'...", "Encrypting your drip...", "Optimizing life choices...", "Defragmenting reality...", "Rebooting existential crisis...", "Recalculating life's meaning...", "Downloading more RAM...", "Polishing digital aura...", "Finalizing system integrity..." ];
+            // Status messages
+            const statusMessages = [
+                "Initializing repair sequence...",
+                "Calibrating your wardrobe taste...",
+                "Counting how many times you've said 'Almost but nope'...",
+                "Encrypting your drip...",
+                "Optimizing life choices...",
+                "Defragmenting reality...",
+                "Rebooting existential crisis...",
+                "Recalculating life's meaning...",
+                "Downloading more RAM...",
+                "Polishing digital aura...",
+                "Finalizing system integrity..."
+            ];
             
             let progress = 0;
-            const totalTime = 240000; // 4 minutes
-            const intervalTime = 100;
+            const totalTime = 240000; // 4 minutes in milliseconds
+            const intervalTime = 100; // Update every 100ms
             const increments = totalTime / intervalTime;
             const progressIncrement = 100 / increments;
             let messageIndex = 0;
-            statusText.textContent = statusMessages[0];
             
             const progressInterval = setInterval(() => {
                 progress += progressIncrement;
-                if (progress > 100) progress = 100;
                 progressBar.style.width = `${progress}%`;
-                progressBar.textContent = `${Math.floor(progress)}%`;
+                progressBar.textContent = `${Math.round(progress)}%`;
                 
-                let nextMessageIndex = Math.floor(progress / 10);
-                if (nextMessageIndex > messageIndex && statusMessages[nextMessageIndex]) {
-                    messageIndex = nextMessageIndex;
+                // Update status text at certain intervals
+                if (progress % 10 < progressIncrement) {
+                    messageIndex = Math.min(messageIndex + 1, statusMessages.length - 1);
                     statusText.textContent = statusMessages[messageIndex];
                 }
                 
+                // Complete when progress reaches 100%
                 if (progress >= 100) {
                     clearInterval(progressInterval);
                     progressBar.textContent = "100%";
@@ -1072,8 +1235,11 @@
         function startForcedScroll() {
             isForcedScrollActive = true;
             scrollStartTime = Date.now();
+            
+            // Show forced scroll container
             document.getElementById('forcedScrollContainer').classList.add('active');
             
+            // Generate receipt content
             const forcedReceipt = document.getElementById('forcedReceipt');
             let receiptHTML = `
                 <h3>FINAL TRANSACTION RECEIPT</h3>
@@ -1083,10 +1249,35 @@
                 <p>Transaction ID: GL1TCH-${Math.floor(Math.random() * 10000)}</p>
                 <p>================================</p>
             `;
-            const items = [ "Digital Consciousness Upgrade - ₹14,999", "Reality Distortion Field - ₹7,777", "Temporal Loop Pass - ₹12,345", "Quantum Entanglement Kit - ₹9,876", "Parallel Universe Access - ₹19,999", "Dream Manipulation Software - ₹6,666", "Emotional Intelligence Boost - ₹8,888", "Existential Crisis Insurance - ₹15,000", "Time Dilation Device - ₹22,222", "Memory Encryption Service - ₹5,555", "Virtual Identity Protection - ₹11,111", "Consciousness Backup - ₹25,000", "Reality Glitch Repair - ₹3,333", "Digital Soul Preservation - ₹18,000", "Multiverse Travel Permit - ₹30,000", "Quantum Computing Time - ₹7,500", "Neural Interface Upgrade - ₹12,500", "Emotional Stability Package - ₹9,999", "Digital Afterlife Plan - ₹50,000", "Reality Anchoring Device - ₹13,333" ];
+            
+            // Add many receipt items to make it long
+            const items = [
+                "Digital Consciousness Upgrade - ₹14,999",
+                "Reality Distortion Field - ₹7,777",
+                "Temporal Loop Pass - ₹12,345",
+                "Quantum Entanglement Kit - ₹9,876",
+                "Parallel Universe Access - ₹19,999",
+                "Dream Manipulation Software - ₹6,666",
+                "Emotional Intelligence Boost - ₹8,888",
+                "Existential Crisis Insurance - ₹15,000",
+                "Time Dilation Device - ₹22,222",
+                "Memory Encryption Service - ₹5,555",
+                "Virtual Identity Protection - ₹11,111",
+                "Consciousness Backup - ₹25,000",
+                "Reality Glitch Repair - ₹3,333",
+                "Digital Soul Preservation - ₹18,000",
+                "Multiverse Travel Permit - ₹30,000",
+                "Quantum Computing Time - ₹7,500",
+                "Neural Interface Upgrade - ₹12,500",
+                "Emotional Stability Package - ₹9,999",
+                "Digital Afterlife Plan - ₹50,000",
+                "Reality Anchoring Device - ₹13,333"
+            ];
+            
             items.forEach(item => {
                 receiptHTML += `<p>${item}</p>`;
             });
+            
             receiptHTML += `
                 <p>================================</p>
                 <p>Subtotal: ₹278,883</p>
@@ -1104,95 +1295,77 @@
                 <p>Your consciousness synchronization depends on it.</p>
                 <p>================================</p>
             `;
+            
+            // Add more content to make it even longer
             for (let i = 0; i < 20; i++) {
                 receiptHTML += `<p>Additional security layer ${i+1}: Activated</p>`;
             }
+            
             receiptHTML += `
                 <p>================================</p>
                 <p>SYSTEM MESSAGE: Almost done...</p>
                 <p>Your patience is appreciated.</p>
                 <p>================================</p>
             `;
+            
             forcedReceipt.innerHTML = receiptHTML;
             
+            // Start scrolling
             setTimeout(() => {
                 forcedReceipt.classList.add('scrolling');
             }, 1000);
             
-            const encouragementMessages = [ "Sure it is slow, but once you read it, it's going to be good.", "Something else is going to happen, so please don't exit.", "Please stay. Well, I mean you can't exit, but I am telling something.", "You're almost there! The best part is coming up.", "Just a little more... I promise it will be worth it.", "Don't miss the surprise at the end!", "Your persistence is being recorded and appreciated.", "The system is calibrating to your reading speed.", "This is important for your digital footprint.", "Finalizing your multidimensional transaction..." ];
-            let encouragementIndex = 0;
-            const encouragementInterval = setInterval(() => {
-                if (encouragementIndex < encouragementMessages.length) {
-                    document.getElementById('encouragementMessage').textContent = encouragementMessages[encouragementIndex];
-                    document.getElementById('encouragementMessage').classList.add('active');
-                    encouragementIndex++;
+            // Show glowing text messages at intervals
+            const glowingMessages = [
+                "Well, read the receipt.",
+                "Don't go away because something else is there at the end.",
+                "The best part is coming up, I promise!",
+                "Just a little more patience...",
+                "You're almost there!",
+                "Something special awaits at the end.",
+                "Don't miss the surprise!",
+                "Your persistence will be rewarded.",
+                "The system is calibrating to your reading speed.",
+                "Finalizing your multidimensional transaction..."
+            ];
+            
+            let glowingIndex = 0;
+            const glowingInterval = setInterval(() => {
+                if (glowingIndex < glowingMessages.length) {
+                    document.getElementById('glowingText').textContent = glowingMessages[glowingIndex];
+                    document.getElementById('glowingText').classList.add('active');
+                    glowingIndex++;
+                    
+                    // Hide message after 5 seconds
                     setTimeout(() => {
-                        document.getElementById('encouragementMessage').classList.remove('active');
+                        document.getElementById('glowingText').classList.remove('active');
                     }, 5000);
                 } else {
-                    clearInterval(encouragementInterval);
+                    clearInterval(glowingInterval);
                 }
-            }, 10000);
+            }, 10000); // Show every 10 seconds
             
-            setupExitPrevention();
-            
+            // Redirect after scroll completes
             setTimeout(() => {
                 isForcedScrollActive = false;
                 window.location.href = 'https://notthebestplacetobuystuff.in';
-            }, scrollDuration + 2000);
-        }
-        
-        // Exit prevention system
-        function setupExitPrevention() {
-            document.addEventListener('contextmenu', function(e) {
-                if (isForcedScrollActive) {
-                    e.preventDefault();
-                    showExitMessage();
-                }
-            });
-            
-            document.addEventListener('keydown', function(e) {
-                if (isForcedScrollActive) {
-                    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'u')) {
-                        e.preventDefault();
-                        showExitMessage();
-                    }
-                    if (e.key === 'Escape') {
-                        e.preventDefault();
-                        showExitMessage();
-                    }
-                }
-            });
-            
-            window.addEventListener('beforeunload', function(e) {
-                if (isForcedScrollActive) {
-                    e.preventDefault();
-                    e.returnValue = 'Are you sure you want to leave? The receipt reading is not complete.';
-                    return e.returnValue;
-                }
-            });
-            
-            document.addEventListener('mouseleave', function(e) {
-                if (isForcedScrollActive && e.clientY < 0) {
-                    showExitMessage();
-                }
-            });
-        }
-        
-        // Show exit message
-        function showExitMessage() {
-            document.getElementById('exitMessage').classList.add('active');
-            document.getElementById('continueReading').addEventListener('click', function() {
-                document.getElementById('exitMessage').classList.remove('active');
-            });
+            }, scrollDuration + 2000); // Add 2 seconds buffer
         }
         
         // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
+            // Start with stage 0
             initStage(0);
+            
+            // Initialize audio after user interaction
+            document.addEventListener('click', function initAudioOnInteraction() {
+                initAudio();
+                document.removeEventListener('click', initAudioOnInteraction);
+            });
         });
     </script>
     
+    <!-- html2canvas library for receipt download -->
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>
