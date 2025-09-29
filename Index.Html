@@ -41,6 +41,48 @@
             z-index: 1;
         }
         
+        /* Welcome message overlay */
+        .welcome-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 2s ease-in-out;
+        }
+        
+        .welcome-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .welcome-text {
+            font-size: 2.5rem;
+            text-align: center;
+            padding: 30px;
+            background-color: transparent;
+            animation: welcome-glow 3s infinite alternate;
+            text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0ff, 0 0 40px #0ff;
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        
+        @keyframes welcome-glow {
+            from {
+                box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0ff, 0 0 40px #0ff;
+            }
+            to {
+                box-shadow: 0 0 15px #fff, 0 0 25px #0ff, 0 0 35px #0ff, 0 0 45px #0ff;
+            }
+        }
+        
         /* Receipt styling */
         .receipt {
             background-color: #fff;
@@ -599,10 +641,20 @@
                 max-width: 200px;
                 font-size: 0.9rem;
             }
+            
+            .welcome-text {
+                font-size: 1.8rem;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Welcome Message Overlay -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-text">Welcome to the world's most generic exclusive item.</div>
+    </div>
+    
     <!-- Background Video -->
     <video id="bgVideo" autoplay muted loop>
         <source src="kolppdkdkd" type="video/mp4">
@@ -747,21 +799,43 @@
         const audioToggle = document.getElementById('audioToggle');
         let isAudioPlaying = false;
         
+        // Initialize welcome message
+        function initWelcomeMessage() {
+            const welcomeOverlay = document.getElementById('welcomeOverlay');
+            
+            // Show welcome message for 3 seconds, then fade out
+            setTimeout(() => {
+                welcomeOverlay.classList.add('fade-out');
+                
+                // Remove from DOM after fade out completes
+                setTimeout(() => {
+                    welcomeOverlay.remove();
+                    // Start audio after welcome message disappears
+                    initAudio();
+                }, 2000);
+            }, 3000);
+        }
+        
         // Initialize audio
         function initAudio() {
-            // Try to play audio (will work after user interaction)
-            try {
-                bgAudio.volume = 0.3;
+            // Set audio properties
+            bgAudio.volume = 0.3;
+            
+            // Try to play audio
+            const playAudio = () => {
                 bgAudio.play().then(() => {
                     isAudioPlaying = true;
                     audioToggle.textContent = "🔊";
-                }).catch(() => {
+                    console.log("Audio started successfully");
+                }).catch((error) => {
                     isAudioPlaying = false;
                     audioToggle.textContent = "🔇";
+                    console.log("Audio play failed:", error);
                 });
-            } catch (e) {
-                console.log("Audio error:", e);
-            }
+            };
+            
+            // Try to play immediately
+            playAudio();
             
             // Audio toggle button
             audioToggle.addEventListener('click', function() {
@@ -770,11 +844,16 @@
                     isAudioPlaying = false;
                     audioToggle.textContent = "🔇";
                 } else {
-                    bgAudio.play().then(() => {
-                        isAudioPlaying = true;
-                        audioToggle.textContent = "🔊";
-                    });
+                    playAudio();
                 }
+            });
+            
+            // Also try to play on any user interaction as fallback
+            document.addEventListener('click', function tryPlayOnInteraction() {
+                if (!isAudioPlaying) {
+                    playAudio();
+                }
+                document.removeEventListener('click', tryPlayOnInteraction);
             });
         }
         
@@ -1354,14 +1433,13 @@
         
         // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
-            // Start with stage 0
-            initStage(0);
+            // Start with welcome message
+            initWelcomeMessage();
             
-            // Initialize audio after user interaction
-            document.addEventListener('click', function initAudioOnInteraction() {
-                initAudio();
-                document.removeEventListener('click', initAudioOnInteraction);
-            });
+            // Start with stage 0 after welcome message
+            setTimeout(() => {
+                initStage(0);
+            }, 3000);
         });
     </script>
     
