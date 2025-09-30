@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Receipt Glitch Labyrinth</title>
+    <title>RECEIPT: YOU BOUGHT A MISTAKE</title>
     <style>
         /* Base styles */
         * {
@@ -19,84 +19,63 @@
             overflow-x: hidden;
             min-height: 100vh;
             position: relative;
+            line-height: 1.4;
         }
         
-        /* Background video */
-        #bgVideo {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-            opacity: 0.3;
-        }
-        
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
+        /* Stage management */
+        .stage {
+            display: none;
+            min-height: 100vh;
             padding: 20px;
-            position: relative;
-            z-index: 1;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
         
-        /* Welcome message overlay */
-        .welcome-overlay {
+        .active {
+            display: flex;
+        }
+        
+        /* Progress bar */
+        .progress-container {
             position: fixed;
-            top: 0;
+            bottom: 0;
             left: 0;
             width: 100%;
+            height: 8px;
+            background-color: #333;
+            z-index: 100;
+        }
+        
+        .progress-bar {
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 1;
-            transition: opacity 2s ease-in-out;
+            width: 0%;
+            background-color: #0ff;
+            transition: width 0.3s ease;
         }
         
-        .welcome-overlay.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        .welcome-text {
-            font-size: 2.5rem;
-            text-align: center;
-            padding: 30px;
-            background-color: transparent;
-            animation: welcome-glow 3s infinite alternate;
-            text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0ff, 0 0 40px #0ff;
-            border: 2px solid #0ff;
-            border-radius: 10px;
-            max-width: 80%;
-        }
-        
-        @keyframes welcome-glow {
-            from {
-                box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0ff, 0 0 40px #0ff;
-            }
-            to {
-                box-shadow: 0 0 15px #fff, 0 0 25px #0ff, 0 0 35px #0ff, 0 0 45px #0ff;
-            }
+        .progress-text {
+            position: absolute;
+            bottom: 15px;
+            left: 20px;
+            font-size: 14px;
+            color: #ccc;
         }
         
         /* Receipt styling */
         .receipt {
             background-color: #fff;
             color: #000;
-            padding: 20px;
+            padding: 25px;
             border-radius: 5px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
-            margin-bottom: 20px;
+            margin: 20px auto;
             width: 100%;
             max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
+            background-image: linear-gradient(to bottom, #fff 0%, #f9f9f9 100%);
         }
         
         .receipt::before {
@@ -131,295 +110,119 @@
             );
         }
         
-        /* Glitch effects */
-        .glitch {
-            position: relative;
+        /* QR code styling */
+        .qr-container {
+            margin: 20px 0;
+            padding: 15px;
+            background: #fff;
+            border-radius: 10px;
+            display: inline-block;
         }
         
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .glitch::before {
-            left: 2px;
-            text-shadow: -1px 0 red;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-        
-        .glitch::after {
-            left: -2px;
-            text-shadow: 1px 0 blue;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim2 5s infinite linear alternate-reverse;
-        }
-        
-        @keyframes glitch-anim {
-            0% { clip: rect(42px, 9999px, 44px, 0); }
-            5% { clip: rect(12px, 9999px, 59px, 0); }
-            10% { clip: rect(48px, 9999px, 29px, 0); }
-            15% { clip: rect(42px, 9999px, 73px, 0); }
-            20% { clip: rect(63px, 9999px, 27px, 0); }
-            25% { clip: rect(34px, 9999px, 55px, 0); }
-            30% { clip: rect(86px, 9999px, 73px, 0); }
-            35% { clip: rect(20px, 9999px, 20px, 0); }
-            40% { clip: rect(26px, 9999px, 60px, 0); }
-            45% { clip: rect(25px, 9999px, 66px, 0); }
-            50% { clip: rect(57px, 9999px, 98px, 0); }
-            55% { clip: rect(5px, 9999px, 46px, 0); }
-            60% { clip: rect(82px, 9999px, 31px, 0); }
-            65% { clip: rect(54px, 9999px, 27px, 0); }
-            70% { clip: rect(28px, 9999px, 99px, 0); }
-            75% { clip: rect(45px, 9999px, 69px, 0); }
-            80% { clip: rect(23px, 9999px, 85px, 0); }
-            85% { clip: rect(54px, 9999px, 84px, 0); }
-            90% { clip: rect(45px, 9999px, 47px, 0); }
-            95% { clip: rect(37px, 9999px, 20px, 0); }
-            100% { clip: rect(4px, 9999px, 91px, 0); }
-        }
-        
-        @keyframes glitch-anim2 {
-            0% { clip: rect(65px, 9999px, 100px, 0); }
-            5% { clip: rect(52px, 9999px, 74px, 0); }
-            10% { clip: rect(79px, 9999px, 85px, 0); }
-            15% { clip: rect(75px, 9999px, 5px, 0); }
-            20% { clip: rect(67px, 9999px, 61px, 0); }
-            25% { clip: rect(14px, 9999px, 79px, 0); }
-            30% { clip: rect(1px, 9999px, 66px, 0); }
-            35% { clip: rect(86px, 9999px, 30px, 0); }
-            40% { clip: rect(23px, 9999px, 98px, 0); }
-            45% { clip: rect(85px, 9999px, 72px, 0); }
-            50% { clip: rect(71px, 9999px, 75px, 0); }
-            55% { clip: rect(2px, 9999px, 48px, 0); }
-            60% { clip: rect(30px, 9999px, 16px, 0); }
-            65% { clip: rect(59px, 9999px, 50px, 0); }
-            70% { clip: rect(41px, 9999px, 62px, 0); }
-            75% { clip: rect(2px, 9999px, 82px, 0); }
-            80% { clip: rect(47px, 9999px, 73px, 0); }
-            85% { clip: rect(3px, 9999px, 27px, 0); }
-            90% { clip: rect(26px, 9999px, 55px, 0); }
-            95% { clip: rect(42px, 9999px, 97px, 0); }
-            100% { clip: rect(38px, 9999px, 49px, 0); }
-        }
-        
-        .flicker {
-            animation: flicker 3s linear infinite;
-        }
-        
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        .shake {
-            animation: shake 0.5s linear infinite;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-            20%, 40%, 60%, 80% { transform: translateX(2px); }
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: #000;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 14px;
         }
         
         /* Button styles */
         button {
             background-color: #000;
             color: #fff;
-            border: 1px solid #fff;
-            padding: 10px 20px;
+            border: 2px solid #fff;
+            padding: 15px 30px;
             font-family: 'Courier New', monospace;
+            font-size: 18px;
             cursor: pointer;
             margin: 10px 5px;
             transition: all 0.3s;
-        }
-        
-        button:hover {
-            background-color: #fff;
-            color: #000;
-        }
-        
-        /* Stage-specific styles */
-        .stage {
-            display: none;
-            text-align: center;
-        }
-        
-        .active {
-            display: block;
-        }
-        
-        /* Printer animation */
-        .printer {
-            position: relative;
-            width: 300px;
-            height: 100px;
-            margin: 0 auto 20px;
-            background-color: #333;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .printer::before {
-            content: "";
-            position: absolute;
-            top: 20px;
-            left: 10px;
-            right: 10px;
-            height: 5px;
-            background-color: #666;
-        }
-        
-        .paper {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 250px;
-            height: 0;
-            background-color: #fff;
-            transition: height 2s ease-in-out;
-            overflow: hidden;
-        }
-        
-        .paper-content {
-            padding: 20px;
-            color: #000;
-            text-align: left;
-            opacity: 0;
-            transition: opacity 1s ease-in-out 1s;
-        }
-        
-        .paper.printed {
-            height: 200px;
-        }
-        
-        .paper.printed .paper-content {
-            opacity: 1;
-        }
-        
-        /* Clickable receipt items */
-        .receipt-line {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px dashed #ccc;
-        }
-        
-        .product-name {
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .product-name:hover {
-            text-decoration: underline;
-        }
-        
-        .amount {
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .amount:hover {
-            transform: translateY(-2px);
-        }
-        
-        /* Amount overlay */
-        .amount-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        
-        .amount-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        .amount-text {
-            font-size: 2rem;
-            text-align: center;
-            padding: 20px;
-            background-color: #fff;
-            color: #000;
             border-radius: 5px;
-            max-width: 80%;
+            min-height: 60px;
+            min-width: 200px;
         }
         
-        /* Stage 1 - Overcharged Items */
+        button:hover, button:focus {
+            background-color: #fff;
+            color: #000;
+            outline: 3px solid #0ff;
+        }
+        
+        .primary-btn {
+            background-color: #0ff;
+            color: #000;
+            font-weight: bold;
+            border: 2px solid #0ff;
+        }
+        
+        .primary-btn:hover, .primary-btn:focus {
+            background-color: #000;
+            color: #0ff;
+        }
+        
+        /* Receipt items */
         .receipt-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 12px 0;
             border-bottom: 1px dashed #ccc;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 18px;
+            min-height: 50px;
+            align-items: center;
+        }
+        
+        .receipt-item:hover, .receipt-item:focus {
+            background-color: #f0f0f0;
+            outline: 2px solid #0ff;
         }
         
         .receipt-item.crossed-out {
             text-decoration: line-through;
             opacity: 0.5;
+            background-color: #f9f9f9;
         }
         
-        /* Stage 2 - Hidden Code */
-        .hidden-text {
-            background-color: #000;
-            color: #000;
-            padding: 10px;
-            user-select: none;
-            cursor: grab;
-            position: relative;
-        }
-        
-        .hidden-text.revealed {
-            color: #fff;
-            background-color: #333;
-        }
-        
-        /* Stage 3 - Endless Scroll */
-        .scroll-container {
-            height: 300px;
-            overflow-y: scroll;
-            border: 1px solid #fff;
-            padding: 10px;
-            text-align: left;
-        }
-        
-        /* Stage 4 - Glitch Portal */
+        /* Game elements */
         .game-container {
             position: relative;
-            height: 400px;
-            border: 1px solid #fff;
+            height: 300px;
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #fff;
+            margin: 20px auto;
             overflow: hidden;
-            margin-bottom: 20px;
+            background: #222;
         }
         
-        .falling-receipt {
+        .falling-item {
             position: absolute;
-            background-color: #fff;
-            color: #000;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 12px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
             transition: transform 0.1s;
+            text-align: center;
+            min-width: 100px;
         }
         
-        .falling-receipt.caught {
+        .falling-item.good {
+            background-color: #0f0;
+            color: #000;
+        }
+        
+        .falling-item.bad {
+            background-color: #f00;
+            color: #fff;
+        }
+        
+        .falling-item.caught {
             animation: caught 0.5s forwards;
         }
         
@@ -436,425 +239,344 @@
             background-color: rgba(0, 0, 0, 0.7);
             padding: 5px 10px;
             border-radius: 5px;
+            z-index: 10;
         }
         
-        /* Stage 5 - Progress Bar */
-        .progress-container {
-            width: 100%;
-            background-color: #333;
+        /* Text styles */
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 18px;
+            margin-bottom: 15px;
+            max-width: 600px;
+        }
+        
+        .instruction {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
             border-radius: 5px;
-            margin: 20px 0;
-            overflow: hidden;
+            margin: 15px 0;
+            max-width: 500px;
         }
         
-        .progress-bar {
-            width: 0%;
-            height: 30px;
-            background-color: #fff;
-            transition: width 0.1s linear;
+        /* Help elements */
+        .help-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #000;
+            color: #fff;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #000;
-            font-weight: bold;
-        }
-        
-        .status-text {
-            margin-top: 10px;
-            font-style: italic;
-        }
-        
-        /* Final stage */
-        .shredder {
-            position: relative;
-            width: 300px;
-            height: 100px;
-            margin: 0 auto 20px;
-            background-color: #333;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .shredder::before {
-            content: "";
-            position: absolute;
-            top: 40px;
-            left: 10px;
-            right: 10px;
-            height: 10px;
-            background-color: #666;
-        }
-        
-        .shredded-paper {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 250px;
-            height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 5px,
-                #fff 5px,
-                #fff 10px
-            );
-            animation: shred 2s forwards;
-        }
-        
-        @keyframes shred {
-            0% { height: 100%; }
-            100% { height: 0; }
-        }
-        
-        /* Download button */
-        .download-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #000;
-            color: #fff;
-            border: 1px solid #fff;
-            padding: 10px;
-            border-radius: 50%;
             cursor: pointer;
-            z-index: 10;
+            z-index: 100;
+        }
+        
+        .help-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .help-panel.active {
+            display: flex;
         }
         
         /* Audio controls */
         .audio-controls {
             position: fixed;
             bottom: 20px;
-            left: 20px;
-            z-index: 10;
+            right: 20px;
+            z-index: 100;
         }
         
         .audio-btn {
             background-color: #000;
             color: #fff;
             border: 1px solid #fff;
-            padding: 8px 12px;
+            padding: 10px;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        /* Forced scroll stage */
-        .forced-scroll-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000;
-            z-index: 1000;
-            display: none;
-            overflow: hidden;
-        }
-        
-        .forced-scroll-container.active {
-            display: block;
-        }
-        
-        .forced-receipt {
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            background-color: #fff;
-            color: #000;
+        /* Final reward */
+        .discount-code {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 20px 0;
+            background: #000;
+            color: #0ff;
             padding: 20px;
-            transition: top 120s linear;
+            border-radius: 10px;
+            letter-spacing: 3px;
         }
         
-        .forced-receipt.scrolling {
-            top: -200%;
-        }
-        
-        /* Glowing text messages */
-        .glowing-text {
-            position: fixed;
-            top: 50%;
-            right: 5%;
-            transform: translateY(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
+        .easter-egg {
+            margin-top: 30px;
             padding: 15px;
-            border-radius: 5px;
-            z-index: 1001;
-            display: none;
-            max-width: 250px;
-            text-align: center;
-            animation: glow 2s infinite alternate;
-            border: 1px solid #fff;
-        }
-        
-        .glowing-text.active {
-            display: block;
-        }
-        
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ff, 0 0 20px #0ff;
-            }
-            to {
-                box-shadow: 0 0 10px #fff, 0 0 15px #0ff, 0 0 20px #0ff, 0 0 25px #0ff;
-            }
+            border-top: 1px dashed #ccc;
+            font-size: 14px;
+            color: #888;
         }
         
         /* Responsive adjustments */
         @media (max-width: 600px) {
-            .container {
+            h1 {
+                font-size: 28px;
+            }
+            
+            h2 {
+                font-size: 22px;
+            }
+            
+            p {
+                font-size: 16px;
+            }
+            
+            button {
+                padding: 12px 20px;
+                font-size: 16px;
+                min-height: 50px;
+                min-width: 160px;
+            }
+            
+            .receipt-item {
+                font-size: 16px;
+                min-height: 44px;
+            }
+            
+            .discount-code {
+                font-size: 32px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .stage {
                 padding: 10px;
             }
             
-            .receipt {
-                max-width: 100%;
+            h1 {
+                font-size: 24px;
             }
             
-            .printer, .shredder {
-                width: 100%;
-                max-width: 300px;
+            .qr-code {
+                width: 150px;
+                height: 150px;
             }
-            
-            .game-container {
-                height: 300px;
-            }
-            
-            .amount-text {
-                font-size: 1.5rem;
-            }
-            
-            .audio-controls {
-                bottom: 10px;
-                left: 10px;
-            }
-            
-            .forced-receipt {
-                width: 95%;
-                padding: 15px;
-            }
-            
-            .glowing-text {
-                right: 2%;
-                max-width: 200px;
-                font-size: 0.9rem;
-            }
-            
-            .welcome-text {
-                font-size: 1.8rem;
-                padding: 20px;
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Welcome Message Overlay -->
-    <div class="welcome-overlay" id="welcomeOverlay">
-        <div class="welcome-text">Welcome to the world's most generic exclusive item.</div>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-text" id="progressText">Step 1 of 4</div>
     </div>
     
-    <!-- Background Video -->
-    <video id="bgVideo" autoplay muted loop>
-        <source src="kolppdkdkd" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <!-- Help Toggle -->
+    <button class="help-toggle" id="helpToggle" aria-label="Get help">?</button>
     
-    <!-- Background Audio -->
-    <audio id="bgAudio" loop>
-        <source src="stormy_weather.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
+    <!-- Help Panel -->
+    <div class="help-panel" id="helpPanel">
+        <div class="receipt">
+            <h2>Need Help?</h2>
+            <p id="helpContent">We'll walk you through each step.</p>
+            <button class="primary-btn" id="closeHelp">Got It</button>
+        </div>
+    </div>
     
     <!-- Audio Controls -->
     <div class="audio-controls">
-        <button class="audio-btn" id="audioToggle">🔊</button>
+        <button class="audio-btn" id="audioToggle" aria-label="Toggle audio">🔊</button>
     </div>
     
-    <!-- Amount Overlay -->
-    <div class="amount-overlay" id="amountOverlay">
-        <div class="amount-text" id="amountText"></div>
+    <!-- Stage 0: Landing -->
+    <div id="stage0" class="stage active">
+        <h1>RECEIPT: YOU BOUGHT A MISTAKE</h1>
+        <p class="instruction">Scan the receipt. Tap the items. Fix the glitch. Get your surprise.</p>
+        
+        <div class="qr-container">
+            <div class="qr-code">[QR CODE]</div>
+            <p>Scan with your camera</p>
+        </div>
+        
+        <div>
+            <button class="primary-btn" id="scanBtn">SCAN QR</button>
+            <button id="manualBtn">OPEN MANUALLY</button>
+        </div>
+        
+        <p style="margin-top: 20px; font-size: 14px; color: #ccc;">
+            No idea what to do? Tap 'OPEN MANUALLY' and we'll walk you through.
+        </p>
     </div>
     
-    <!-- Download Button -->
-    <div class="download-btn" id="downloadBtn" title="Download Receipt">↓</div>
-    
-    <!-- Forced Scroll Stage -->
-    <div class="forced-scroll-container" id="forcedScrollContainer">
-        <div class="forced-receipt" id="forcedReceipt">
-            <!-- Receipt content will be added by JavaScript -->
+    <!-- Stage 1: Receipt Overview -->
+    <div id="stage1" class="stage">
+        <h1>Your Purchase</h1>
+        <p class="instruction">Tap three things you don't want.</p>
+        
+        <div class="receipt">
+            <h2>STORE RECEIPT</h2>
+            <p>================================</p>
+            
+            <div class="receipt-item" tabindex="0" role="button" aria-label="Overpriced Hat, tap to remove">
+                <span>Overpriced Hat</span>
+                <span>₹2,499</span>
+            </div>
+            
+            <div class="receipt-item" tabindex="0" role="button" aria-label="Broken Socks, tap to remove">
+                <span>Broken Socks</span>
+                <span>₹99</span>
+            </div>
+            
+            <div class="receipt-item" tabindex="0" role="button" aria-label="Expired Milk, tap to remove">
+                <span>Expired Milk</span>
+                <span>₹149</span>
+            </div>
+            
+            <div class="receipt-item" tabindex="0" role="button" aria-label="Luxury Regret, tap to remove">
+                <span>Luxury Regret</span>
+                <span>₹999</span>
+            </div>
+            
+            <div class="receipt-item" tabindex="0" role="button" aria-label="Digital Disappointment, tap to remove">
+                <span>Digital Disappointment</span>
+                <span>₹1,299</span>
+            </div>
+            
+            <div class="receipt-item" tabindex="0" role="button" aria-label="Broken Dreams, tap to remove">
+                <span>Broken Dreams</span>
+                <span>₹4,999</span>
+            </div>
+            
+            <p>================================</p>
+            <p>TOTAL: ₹10,044</p>
+            <p>================================</p>
         </div>
         
-        <!-- Glowing text messages -->
-        <div class="glowing-text" id="glowingText">
-            <!-- Text will be added by JavaScript -->
+        <p id="selectionMessage">Selected: <span id="selectedCount">0</span>/3 items</p>
+        <button class="primary-btn" id="stage1Btn" disabled>Continue</button>
+    </div>
+    
+    <!-- Stage 2: Receipt Flow -->
+    <div id="stage2" class="stage">
+        <h1>Fixing The Glitch</h1>
+        <p class="instruction" id="flowInstruction">Receipt scanning... 50% chaos detected</p>
+        
+        <div class="receipt">
+            <h2>SYSTEM RECOVERY</h2>
+            <p>================================</p>
+            <p>Removing unwanted items...</p>
+            <p>Recalculating total...</p>
+            <p>================================</p>
+            <p id="glitchMessage">FIX GLITCH</p>
+            <p>================================</p>
+            <p>System rebooting...</p>
+            <p>Almost there...</p>
+            <p>================================</p>
+        </div>
+        
+        <button class="primary-btn" id="fixGlitchBtn" style="display: none;">FIX GLITCH</button>
+        <button class="primary-btn" id="stage2Btn" style="display: none;">Continue</button>
+    </div>
+    
+    <!-- Stage 3: Mini Game -->
+    <div id="stage3" class="stage">
+        <h1>CATCH WHAT MATTERS</h1>
+        <p class="instruction">Tap or press SPACE to catch the green items. Avoid red VOID items.</p>
+        
+        <div class="game-container" id="gameContainer">
+            <div class="score">Caught: <span id="score">0</span>/8</div>
+            <!-- Falling items will be generated here -->
+        </div>
+        
+        <div>
+            <button class="primary-btn" id="actionBtn">TAP TO CATCH</button>
+            <button id="skipGameBtn">Skip</button>
         </div>
     </div>
     
-    <div class="container">
-        <!-- Initial Stage - Printer Animation -->
-        <div id="stage0" class="stage active">
-            <h1 class="glitch flicker" data-text="Receipt Glitch Labyrinth">Receipt Glitch Labyrinth</h1>
-            <div class="printer">
-                <div class="paper" id="printerPaper">
-                    <div class="paper-content" id="printedReceipt">
-                        <!-- Receipt content will be added by JavaScript -->
-                    </div>
-                </div>
-            </div>
-            <button id="unrollBtn">Unroll Receipt</button>
+    <!-- Stage 4: Reward -->
+    <div id="stage4" class="stage">
+        <h1>YOU DID IT</h1>
+        <p class="instruction">21.01% off — because you survived the receipt.</p>
+        
+        <div class="receipt">
+            <h2>THANK YOU</h2>
+            <p>================================</p>
+            <p>Your corrected total:</p>
+            <div class="discount-code">2101SURVIVOR</div>
+            <p>================================</p>
+            <p>Use this code at checkout</p>
+            <p>================================</p>
         </div>
         
-        <!-- Stage 1 - Overcharged Items Riddle -->
-        <div id="stage1" class="stage">
-            <div class="receipt">
-                <h3>STORE RECEIPT</h3>
-                <p>================================</p>
-                <div class="receipt-item" data-fake="true">Patience Fee - ₹9,999</div>
-                <div class="receipt-item" data-fake="false">Free Wi-Fi - ₹0.00</div>
-                <div class="receipt-item" data-fake="true">Midlife Crisis - Priceless</div>
-                <div class="receipt-item" data-fake="false">Tax - ₹120.50</div>
-                <div class="receipt-item" data-fake="true">Invisible Ink - ₹4,299</div>
-                <div class="receipt-item" data-fake="false">Subtotal - ₹1,200.50</div>
-                <p>================================</p>
-                <p>Tap to cross out fake charges</p>
-            </div>
-            <p id="stage1Message">Cross out at least 2 fake charges</p>
-            <button id="stage1Btn" disabled>Continue</button>
-        </div>
+        <button class="primary-btn" id="shopBtn">USE DISCOUNT — GO SHOP</button>
         
-        <!-- Stage 2 - Hidden Code -->
-        <div id="stage2" class="stage">
-            <div class="receipt">
-                <h3>CORRUPTED DATA</h3>
-                <p>================================</p>
-                <div class="hidden-text" id="hiddenText">
-                    #@!%$^&*()_+}{":?><~`//\\|| Y0u 4r3 n0t supp0s3d t0 b3 h3r3... @#$%^&*()
-                </div>
-                <p>================================</p>
-                <p>Swipe or drag to reveal hidden message</p>
-            </div>
-            <button id="stage2Btn" disabled>Continue</button>
-        </div>
-        
-        <!-- Stage 3 - Endless Scroll -->
-        <div id="stage3" class="stage">
-            <div class="receipt">
-                <h3>SYSTEM STREAM</h3>
-                <p>================================</p>
-                <div class="scroll-container" id="endlessScroll">
-                    <!-- Content will be generated by JavaScript -->
-                </div>
-                <p>================================</p>
-            </div>
-            <div id="stage3Question" style="display: none;">
-                <p>Do you want to fix the receipt or let it glitch?</p>
-                <button id="fixBtn">Fix Receipt</button>
-                <button id="glitchBtn">Let It Glitch</button>
-            </div>
-        </div>
-        
-        <!-- Stage 4 - Glitch Portal Mini-Game -->
-        <div id="stage4" class="stage">
-            <h2 class="glitch" data-text="GLITCH PORTAL">GLITCH PORTAL</h2>
-            <div class="game-container" id="gameContainer">
-                <div class="score">Caught: <span id="score">0</span>/10</div>
-            </div>
-            <p>Catch the falling receipts to resolve the error</p>
-            <button id="stage4Btn" disabled>Continue</button>
-        </div>
-        
-        <!-- Stage 5 - System Repair Progress -->
-        <div id="stage5" class="stage">
-            <h2 class="flicker">SYSTEM REPAIR IN PROGRESS</h2>
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar">0%</div>
-            </div>
-            <p class="status-text" id="statusText">Initializing repair sequence...</p>
-            <button id="stage5Btn" disabled>Continue</button>
-        </div>
-        
-        <!-- Final Stage - Redirect -->
-        <div id="finalStage" class="stage">
-            <div class="shredder">
-                <div class="shredded-paper"></div>
-            </div>
-            <h2 class="glitch" data-text="SYSTEM REBOOT COMPLETE">SYSTEM REBOOT COMPLETE</h2>
-            <p>Your true purchase has been processed.</p>
-            <p>Redirecting to secure portal...</p>
+        <div class="easter-egg">
+            <p>Tiny secret: <button id="spotifyBtn" style="background: none; border: none; color: #0ff; text-decoration: underline; cursor: pointer;">play this if you dare (tiny sound)</button></p>
         </div>
     </div>
 
     <script>
         // Stage management
         let currentStage = 0;
-        const totalStages = 6;
-        let isForcedScrollActive = false;
-        let scrollStartTime = null;
-        let scrollDuration = 120000; // 120 seconds for forced scroll
+        const totalStages = 4;
+        let selectedItems = 0;
+        let gameScore = 0;
+        let gameItems = [];
+        let gameInterval;
         
-        // Audio management
-        const bgAudio = document.getElementById('bgAudio');
-        const audioToggle = document.getElementById('audioToggle');
+        // Audio elements
+        const bgAudio = new Audio('stormy_weather.mp3');
+        bgAudio.loop = true;
+        bgAudio.volume = 0.3;
         let isAudioPlaying = false;
         
-        // Initialize welcome message
-        function initWelcomeMessage() {
-            const welcomeOverlay = document.getElementById('welcomeOverlay');
-            
-            // Show welcome message for 3 seconds, then fade out
-            setTimeout(() => {
-                welcomeOverlay.classList.add('fade-out');
-                
-                // Remove from DOM after fade out completes
-                setTimeout(() => {
-                    welcomeOverlay.remove();
-                    // Start audio after welcome message disappears
-                    initAudio();
-                }, 2000);
-            }, 3000);
-        }
-        
-        // Initialize audio
-        function initAudio() {
-            // Set audio properties
-            bgAudio.volume = 0.3;
-            
-            // Try to play audio
-            const playAudio = () => {
-                bgAudio.play().then(() => {
-                    isAudioPlaying = true;
-                    audioToggle.textContent = "🔊";
-                    console.log("Audio started successfully");
-                }).catch((error) => {
-                    isAudioPlaying = false;
-                    audioToggle.textContent = "🔇";
-                    console.log("Audio play failed:", error);
-                });
-            };
-            
-            // Try to play immediately
-            playAudio();
-            
-            // Audio toggle button
-            audioToggle.addEventListener('click', function() {
-                if (isAudioPlaying) {
-                    bgAudio.pause();
-                    isAudioPlaying = false;
-                    audioToggle.textContent = "🔇";
-                } else {
-                    playAudio();
-                }
-            });
-            
-            // Also try to play on any user interaction as fallback
-            document.addEventListener('click', function tryPlayOnInteraction() {
-                if (!isAudioPlaying) {
-                    playAudio();
-                }
-                document.removeEventListener('click', tryPlayOnInteraction);
-            });
+        // Progress management
+        function updateProgress() {
+            const progress = (currentStage / totalStages) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `Step ${currentStage + 1} of ${totalStages + 1}`;
         }
         
         // Move to next stage
@@ -862,14 +584,16 @@
             document.getElementById(`stage${currentStage}`).classList.remove('active');
             currentStage++;
             
-            if (currentStage < totalStages) {
+            if (currentStage <= totalStages) {
                 document.getElementById(`stage${currentStage}`).classList.add('active');
-                
-                // Initialize stage-specific functionality
+                updateProgress();
                 initStage(currentStage);
+                
+                // Save progress
+                localStorage.setItem('receiptProgress', currentStage);
             } else {
-                // Final stage - start forced scroll before redirect
-                startForcedScroll();
+                // Redirect to shop
+                window.location.href = 'https://notthebestplacetobuystuff.in?discount=2101SURVIVOR';
             }
         }
         
@@ -877,573 +601,309 @@
         function initStage(stage) {
             switch(stage) {
                 case 0:
-                    // Initial printer animation
                     initStage0();
                     break;
-                    
                 case 1:
-                    // Stage 1 - Overcharged items
                     initStage1();
                     break;
-                    
                 case 2:
-                    // Stage 2 - Hidden code
                     initStage2();
                     break;
-                    
                 case 3:
-                    // Stage 3 - Endless scroll
                     initStage3();
                     break;
-                    
                 case 4:
-                    // Stage 4 - Mini-game
                     initStage4();
                     break;
-                    
-                case 5:
-                    // Stage 5 - Progress bar
-                    initStage5();
-                    break;
             }
         }
         
-        // Stage 0 functionality - Printer animation with clickable items
+        // Stage 0: Landing
         function initStage0() {
-            const paper = document.getElementById('printerPaper');
-            const receiptContent = document.getElementById('printedReceipt');
-            const unrollBtn = document.getElementById('unrollBtn');
-            
-            // Receipt items with product names and amounts
-            const receiptItems = [
-                { product: "Digital Oxygen", amount: "₹499" },
-                { product: "Cloud Storage for Dreams", amount: "₹1,299" },
-                { product: "WiFi Signal Booster", amount: "₹799" },
-                { product: "Invisible Ink Cartridge", amount: "₹2,499" },
-                { product: "Time Travel Surcharge", amount: "₹9,999" },
-                { product: "Digital Footprint Cleaner", amount: "₹3,999" },
-                { product: "Privacy Tax", amount: "₹1,200" }
-            ];
-            
-            // Build receipt content with clickable elements
-            let receiptHTML = `
-                <h3>STORE RECEIPT</h3>
-                <p>================================</p>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>Time: ${new Date().toLocaleTimeString()}</p>
-                <p>================================</p>
-            `;
-            
-            receiptItems.forEach(item => {
-                receiptHTML += `
-                    <div class="receipt-line">
-                        <span class="product-name" data-product="${item.product}">${item.product}</span>
-                        <span class="amount" data-amount="${item.amount}">${item.amount}</span>
-                    </div>
-                `;
+            document.getElementById('scanBtn').addEventListener('click', function() {
+                // In a real implementation, this would trigger camera
+                nextStage();
             });
             
-            receiptHTML += `
-                <p>================================</p>
-                <p>Total: ₹19,294</p>
-                <p>================================</p>
-                <p>Thank you for your purchase!</p>
-            `;
-            
-            // Animate printing
-            setTimeout(() => {
-                paper.classList.add('printed');
-                receiptContent.innerHTML = receiptHTML;
-                
-                // Add click handlers after content is visible
-                setTimeout(() => {
-                    // Product name click - redirect to About Us
-                    document.querySelectorAll('.product-name').forEach(element => {
-                        element.addEventListener('click', () => {
-                            window.location.href = 'https://notthebestplacetobuystuff.in/our-mission';
-                        });
-                    });
-                    
-                    // Amount click - show amount in words
-                    document.querySelectorAll('.amount').forEach(element => {
-                        element.addEventListener('click', () => {
-                            const amount = element.getAttribute('data-amount');
-                            const amountText = convertAmountToWords(amount);
-                            document.getElementById('amountText').textContent = amountText;
-                            document.getElementById('amountOverlay').classList.add('active');
-                            
-                            // Hide overlay after 3 seconds
-                            setTimeout(() => {
-                                document.getElementById('amountOverlay').classList.remove('active');
-                            }, 3000);
-                        });
-                    });
-                }, 1000);
-            }, 500);
-            
-            // Unroll button functionality
-            unrollBtn.addEventListener('click', nextStage);
-        }
-        
-        // Convert amount to words (simplified version)
-        function convertAmountToWords(amount) {
-            const amountNum = parseInt(amount.replace('₹', '').replace(',', ''));
-            
-            // Simple conversion for demo purposes
-            const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-            const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-            const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-            
-            if (amountNum === 0) return 'Zero Rupees';
-            
-            let words = '';
-            
-            if (amountNum >= 1000) {
-                words += units[Math.floor(amountNum / 1000)] + ' Thousand ';
-                amountNum %= 1000;
-            }
-            
-            if (amountNum >= 100) {
-                words += units[Math.floor(amountNum / 100)] + ' Hundred ';
-                amountNum %= 100;
-            }
-            
-            if (amountNum >= 20) {
-                words += tens[Math.floor(amountNum / 10)] + ' ';
-                amountNum %= 10;
-            } else if (amountNum >= 10) {
-                words += teens[amountNum - 10] + ' ';
-                amountNum = 0;
-            }
-            
-            if (amountNum > 0) {
-                words += units[amountNum] + ' ';
-            }
-            
-            return words.trim() + ' Rupees';
-        }
-        
-        // Download receipt functionality
-        document.getElementById('downloadBtn').addEventListener('click', function() {
-            // Create a canvas to capture the receipt
-            const receipt = document.querySelector('.receipt') || document.getElementById('printedReceipt').parentElement;
-            html2canvas(receipt).then(canvas => {
-                // Convert canvas to image and trigger download
-                const link = document.createElement('a');
-                link.download = 'receipt.png';
-                link.href = canvas.toDataURL();
-                link.click();
+            document.getElementById('manualBtn').addEventListener('click', function() {
+                nextStage();
             });
-        });
+            
+            // Set help content for this stage
+            document.getElementById('helpContent').textContent = 
+                "Tap 'SCAN QR' to use your camera, or 'OPEN MANUALLY' to continue without scanning.";
+        }
         
-        // Stage 1 functionality
+        // Stage 1: Receipt selection
         function initStage1() {
-            const items = document.querySelectorAll('.receipt-item');
-            const continueBtn = document.getElementById('stage1Btn');
-            const message = document.getElementById('stage1Message');
-            let crossedOutCount = 0;
-            let fakeCrossedOut = 0;
+            selectedItems = 0;
+            updateSelectionMessage();
             
+            const items = document.querySelectorAll('#stage1 .receipt-item');
             items.forEach(item => {
-                item.addEventListener('click', () => {
-                    if (!item.classList.contains('crossed-out')) {
-                        item.classList.add('crossed-out');
-                        crossedOutCount++;
-                        
-                        if (item.dataset.fake === 'true') {
-                            fakeCrossedOut++;
-                        }
-                        
-                        // Check if conditions are met
-                        if (fakeCrossedOut >= 2) {
-                            continueBtn.disabled = false;
-                            message.textContent = "Correct! Proceeding to next stage...";
-                            
-                            // Add glitch effect
-                            document.querySelector('.receipt').classList.add('shake');
-                            setTimeout(() => {
-                                document.querySelector('.receipt').classList.remove('shake');
-                            }, 1000);
-                        } else if (crossedOutCount >= 2) {
-                            message.textContent = "Those aren't all fake charges. Try again!";
-                        }
+                item.addEventListener('click', handleItemSelection);
+                item.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleItemSelection.call(this, e);
                     }
                 });
             });
             
-            continueBtn.addEventListener('click', nextStage);
+            document.getElementById('stage1Btn').addEventListener('click', nextStage);
+            
+            // Set help content for this stage
+            document.getElementById('helpContent').textContent = 
+                "Tap once on any line — it will cross out. If you use a keyboard, press Tab to select then Enter.";
         }
         
-        // Stage 2 functionality
+        function handleItemSelection() {
+            if (!this.classList.contains('crossed-out')) {
+                this.classList.add('crossed-out');
+                selectedItems++;
+                updateSelectionMessage();
+                
+                // Play subtle sound effect
+                const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQ');
+                audio.volume = 0.2;
+                audio.play().catch(() => {});
+                
+                // Update aria label
+                const itemText = this.querySelector('span').textContent;
+                this.setAttribute('aria-label', `${itemText}, removed`);
+            }
+            
+            // Enable continue button when 3 items are selected
+            if (selectedItems >= 3) {
+                document.getElementById('stage1Btn').disabled = false;
+            }
+        }
+        
+        function updateSelectionMessage() {
+            document.getElementById('selectedCount').textContent = selectedItems;
+            if (selectedItems >= 3) {
+                document.getElementById('selectionMessage').textContent = "Ready to continue!";
+            }
+        }
+        
+        // Stage 2: Receipt flow with glitches
         function initStage2() {
-            const hiddenText = document.getElementById('hiddenText');
-            const continueBtn = document.getElementById('stage2Btn');
-            let isRevealed = false;
+            let glitchCount = 0;
+            const maxGlitches = 3;
             
-            // Mouse/touch events for revealing text
-            hiddenText.addEventListener('mousedown', startReveal);
-            hiddenText.addEventListener('touchstart', startReveal);
+            // Show glitch button after a delay
+            setTimeout(() => {
+                document.getElementById('fixGlitchBtn').style.display = 'block';
+                document.getElementById('flowInstruction').textContent = "Glitch detected! Tap to fix.";
+            }, 2000);
             
-            function startReveal(e) {
-                if (isRevealed) return;
+            document.getElementById('fixGlitchBtn').addEventListener('click', function() {
+                glitchCount++;
+                document.getElementById('glitchMessage').textContent = `GLITCH FIXED (${glitchCount}/${maxGlitches})`;
                 
-                e.preventDefault();
-                hiddenText.classList.add('revealed');
-                isRevealed = true;
-                
-                // Enable continue button after a delay
-                setTimeout(() => {
-                    continueBtn.disabled = false;
-                }, 1000);
-            }
-            
-            continueBtn.addEventListener('click', nextStage);
-        }
-        
-        // Stage 3 functionality
-        function initStage3() {
-            const scrollContainer = document.getElementById('endlessScroll');
-            const questionDiv = document.getElementById('stage3Question');
-            
-            // Generate random content for scrolling
-            const content = [
-                "ITEM: Digital Oxygen - ₹499",
-                "ITEM: Cloud Storage for Dreams - ₹1,299",
-                "ITEM: WiFi Signal Booster - ₹799",
-                "--------------------------------",
-                "ASCII ART:",
-                "  /\\_/\\",
-                " ( o.o )",
-                "  > ^ <",
-                "--------------------------------",
-                "MEME: One does not simply fix a glitched receipt",
-                "--------------------------------",
-                "ITEM: Invisible Ink Cartridge - ₹2,499",
-                "ITEM: Time Travel Surcharge - ₹9,999",
-                "--------------------------------",
-                "SYSTEM: Processing... Processing...",
-                "ERROR: Cannot compute meaning of life",
-                "--------------------------------",
-                "ITEM: Digital Footprint Cleaner - ₹3,999",
-                "ITEM: Privacy Tax - ₹1,200",
-                "--------------------------------",
-                "MEME: I came, I saw, I got confused by the receipt",
-                "--------------------------------",
-                "ASCII ART:",
-                "   _____",
-                "  /     \\",
-                " | () () |",
-                "  \\  ^  /",
-                "   |||||",
-                "--------------------------------"
-            ];
-            
-            // Fill the container with content
-            let fullContent = [];
-            for (let i = 0; i < 10; i++) {
-                fullContent = fullContent.concat(content);
-            }
-            
-            scrollContainer.innerHTML = fullContent.join('<br>');
-            
-            // Auto-scroll
-            let scrollPosition = 0;
-            const scrollInterval = setInterval(() => {
-                scrollPosition += 2;
-                scrollContainer.scrollTop = scrollPosition;
-                
-                // Stop after 20 seconds
-                if (scrollPosition > 5000) {
-                    clearInterval(scrollInterval);
-                    
-                    // Add glitch effect
-                    scrollContainer.innerHTML = "SYSTEM GLITCH DETECTED<br>=====================<br>ERROR: STREAM CORRUPTED";
-                    scrollContainer.classList.add('glitch');
-                    
-                    // Show question
+                if (glitchCount >= maxGlitches) {
+                    this.style.display = 'none';
+                    document.getElementById('stage2Btn').style.display = 'block';
+                    document.getElementById('flowInstruction').textContent = "All glitches fixed!";
+                } else {
+                    // Show next glitch after a delay
                     setTimeout(() => {
-                        questionDiv.style.display = 'block';
+                        document.getElementById('glitchMessage').textContent = "FIX GLITCH";
                     }, 1000);
                 }
-            }, 50);
-            
-            // Button handlers
-            document.getElementById('fixBtn').addEventListener('click', nextStage);
-            document.getElementById('glitchBtn').addEventListener('click', nextStage);
-        }
-        
-        // Stage 4 functionality
-        function initStage4() {
-            const gameContainer = document.getElementById('gameContainer');
-            const scoreElement = document.getElementById('score');
-            const continueBtn = document.getElementById('stage4Btn');
-            let score = 0;
-            let receipts = [];
-            
-            // Receipt labels
-            const receiptLabels = [
-                "Drip Insurance - ₹9999",
-                "Handling Fee of Happiness - ₹420",
-                "Air Tax - ₹299",
-                "Digital Soul - ₹7,777",
-                "WiFi Aura - ₹1,234",
-                "Cloud Emotions - ₹5,555",
-                "Virtual Reality Surcharge - ₹3,333",
-                "Data Detox - ₹6,666",
-                "Dream Storage - ₹8,888",
-                "Time Compression - ₹9,999",
-                "Reality Glitch Fix - ₹4,444",
-                "Existence Verification - ₹2,222"
-            ];
-            
-            // Create falling receipts
-            function createReceipt() {
-                if (score >= 10) return;
-                
-                const receipt = document.createElement('div');
-                receipt.className = 'falling-receipt';
-                receipt.textContent = receiptLabels[Math.floor(Math.random() * receiptLabels.length)];
-                
-                // Random position
-                const leftPos = Math.random() * (gameContainer.offsetWidth - 100);
-                receipt.style.left = `${leftPos}px`;
-                receipt.style.top = '-50px';
-                
-                // Add to container
-                gameContainer.appendChild(receipt);
-                receipts.push(receipt);
-                
-                // Falling animation
-                let topPos = -50;
-                const fallInterval = setInterval(() => {
-                    topPos += 3;
-                    receipt.style.top = `${topPos}px`;
-                    
-                    // Remove if out of bounds
-                    if (topPos > gameContainer.offsetHeight) {
-                        clearInterval(fallInterval);
-                        gameContainer.removeChild(receipt);
-                        receipts = receipts.filter(r => r !== receipt);
-                    }
-                }, 50);
-                
-                // Click/tap to catch
-                receipt.addEventListener('click', () => {
-                    if (receipt.classList.contains('caught')) return;
-                    
-                    receipt.classList.add('caught');
-                    score++;
-                    scoreElement.textContent = score;
-                    
-                    // Remove after animation
-                    setTimeout(() => {
-                        if (gameContainer.contains(receipt)) {
-                            gameContainer.removeChild(receipt);
-                        }
-                        receipts = receipts.filter(r => r !== receipt);
-                    }, 500);
-                    
-                    // Check if game is complete
-                    if (score >= 10) {
-                        continueBtn.disabled = false;
-                    }
-                });
-                
-                // Create next receipt after random delay
-                setTimeout(createReceipt, Math.random() * 1000 + 500);
-            }
-            
-            // Start creating receipts
-            createReceipt();
-            
-            continueBtn.addEventListener('click', nextStage);
-        }
-        
-        // Stage 5 functionality
-        function initStage5() {
-            const progressBar = document.getElementById('progressBar');
-            const statusText = document.getElementById('statusText');
-            const continueBtn = document.getElementById('stage5Btn');
-            
-            // Status messages
-            const statusMessages = [
-                "Initializing repair sequence...",
-                "Calibrating your wardrobe taste...",
-                "Counting how many times you've said 'Almost but nope'...",
-                "Encrypting your drip...",
-                "Optimizing life choices...",
-                "Defragmenting reality...",
-                "Rebooting existential crisis...",
-                "Recalculating life's meaning...",
-                "Downloading more RAM...",
-                "Polishing digital aura...",
-                "Finalizing system integrity..."
-            ];
-            
-            let progress = 0;
-            const totalTime = 240000; // 4 minutes in milliseconds
-            const intervalTime = 100; // Update every 100ms
-            const increments = totalTime / intervalTime;
-            const progressIncrement = 100 / increments;
-            let messageIndex = 0;
-            
-            const progressInterval = setInterval(() => {
-                progress += progressIncrement;
-                progressBar.style.width = `${progress}%`;
-                progressBar.textContent = `${Math.round(progress)}%`;
-                
-                // Update status text at certain intervals
-                if (progress % 10 < progressIncrement) {
-                    messageIndex = Math.min(messageIndex + 1, statusMessages.length - 1);
-                    statusText.textContent = statusMessages[messageIndex];
-                }
-                
-                // Complete when progress reaches 100%
-                if (progress >= 100) {
-                    clearInterval(progressInterval);
-                    progressBar.textContent = "100%";
-                    statusText.textContent = "System repair complete!";
-                    continueBtn.disabled = false;
-                }
-            }, intervalTime);
-            
-            continueBtn.addEventListener('click', nextStage);
-        }
-        
-        // Forced scroll functionality
-        function startForcedScroll() {
-            isForcedScrollActive = true;
-            scrollStartTime = Date.now();
-            
-            // Show forced scroll container
-            document.getElementById('forcedScrollContainer').classList.add('active');
-            
-            // Generate receipt content
-            const forcedReceipt = document.getElementById('forcedReceipt');
-            let receiptHTML = `
-                <h3>FINAL TRANSACTION RECEIPT</h3>
-                <p>================================</p>
-                <p>Date: ${new Date().toLocaleDateString()}</p>
-                <p>Time: ${new Date().toLocaleTimeString()}</p>
-                <p>Transaction ID: GL1TCH-${Math.floor(Math.random() * 10000)}</p>
-                <p>================================</p>
-            `;
-            
-            // Add many receipt items to make it long
-            const items = [
-                "Digital Consciousness Upgrade - ₹14,999",
-                "Reality Distortion Field - ₹7,777",
-                "Temporal Loop Pass - ₹12,345",
-                "Quantum Entanglement Kit - ₹9,876",
-                "Parallel Universe Access - ₹19,999",
-                "Dream Manipulation Software - ₹6,666",
-                "Emotional Intelligence Boost - ₹8,888",
-                "Existential Crisis Insurance - ₹15,000",
-                "Time Dilation Device - ₹22,222",
-                "Memory Encryption Service - ₹5,555",
-                "Virtual Identity Protection - ₹11,111",
-                "Consciousness Backup - ₹25,000",
-                "Reality Glitch Repair - ₹3,333",
-                "Digital Soul Preservation - ₹18,000",
-                "Multiverse Travel Permit - ₹30,000",
-                "Quantum Computing Time - ₹7,500",
-                "Neural Interface Upgrade - ₹12,500",
-                "Emotional Stability Package - ₹9,999",
-                "Digital Afterlife Plan - ₹50,000",
-                "Reality Anchoring Device - ₹13,333"
-            ];
-            
-            items.forEach(item => {
-                receiptHTML += `<p>${item}</p>`;
             });
             
-            receiptHTML += `
-                <p>================================</p>
-                <p>Subtotal: ₹278,883</p>
-                <p>Reality Tax: ₹55,777</p>
-                <p>Consciousness Fee: ₹33,333</p>
-                <p>================================</p>
-                <p>TOTAL: ₹368,000</p>
-                <p>================================</p>
-                <p>Thank you for your metaphysical purchase!</p>
-                <p>Your transaction has been processed across multiple dimensions.</p>
-                <p>Please keep this receipt for your records.</p>
-                <p>Reality may vary based on your perception.</p>
-                <p>================================</p>
-                <p>WARNING: Do not attempt to exit before reading completely.</p>
-                <p>Your consciousness synchronization depends on it.</p>
-                <p>================================</p>
-            `;
+            document.getElementById('stage2Btn').addEventListener('click', nextStage);
             
-            // Add more content to make it even longer
-            for (let i = 0; i < 20; i++) {
-                receiptHTML += `<p>Additional security layer ${i+1}: Activated</p>`;
-            }
-            
-            receiptHTML += `
-                <p>================================</p>
-                <p>SYSTEM MESSAGE: Almost done...</p>
-                <p>Your patience is appreciated.</p>
-                <p>================================</p>
-            `;
-            
-            forcedReceipt.innerHTML = receiptHTML;
-            
-            // Start scrolling
-            setTimeout(() => {
-                forcedReceipt.classList.add('scrolling');
-            }, 1000);
-            
-            // Show glowing text messages at intervals
-            const glowingMessages = [
-                "Well, read the receipt.",
-                "Don't go away because something else is there at the end.",
-                "The best part is coming up, I promise!",
-                "Just a little more patience...",
-                "You're almost there!",
-                "Something special awaits at the end.",
-                "Don't miss the surprise!",
-                "Your persistence will be rewarded.",
-                "The system is calibrating to your reading speed.",
-                "Finalizing your multidimensional transaction..."
-            ];
-            
-            let glowingIndex = 0;
-            const glowingInterval = setInterval(() => {
-                if (glowingIndex < glowingMessages.length) {
-                    document.getElementById('glowingText').textContent = glowingMessages[glowingIndex];
-                    document.getElementById('glowingText').classList.add('active');
-                    glowingIndex++;
-                    
-                    // Hide message after 5 seconds
-                    setTimeout(() => {
-                        document.getElementById('glowingText').classList.remove('active');
-                    }, 5000);
-                } else {
-                    clearInterval(glowingInterval);
-                }
-            }, 10000); // Show every 10 seconds
-            
-            // Redirect after scroll completes
-            setTimeout(() => {
-                isForcedScrollActive = false;
-                window.location.href = 'https://notthebestplacetobuystuff.in';
-            }, scrollDuration + 2000); // Add 2 seconds buffer
+            // Set help content for this stage
+            document.getElementById('helpContent').textContent = 
+                "When a glitch appears, tap the 'FIX GLITCH' button to continue.";
         }
         
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', () => {
-            // Start with welcome message
-            initWelcomeMessage();
+        // Stage 3: Mini game
+        function initStage3() {
+            gameScore = 0;
+            document.getElementById('score').textContent = gameScore;
             
-            // Start with stage 0 after welcome message
-            setTimeout(() => {
+            // Set up game controls
+            document.getElementById('actionBtn').addEventListener('click', catchItem);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === ' ' || e.key === 'Spacebar') {
+                    e.preventDefault();
+                    catchItem();
+                }
+            });
+            
+            document.getElementById('skipGameBtn').addEventListener('click', function() {
+                clearInterval(gameInterval);
+                nextStage();
+            });
+            
+            // Start generating items
+            gameInterval = setInterval(createFallingItem, 1000);
+            
+            // Set help content for this stage
+            document.getElementById('helpContent').textContent = 
+                "Tap the button or press SPACE to catch green items. Avoid red VOID items. Catch 8 to continue.";
+        }
+        
+        function createFallingItem() {
+            if (gameScore >= 8) {
+                clearInterval(gameInterval);
+                nextStage();
+                return;
+            }
+            
+            const container = document.getElementById('gameContainer');
+            const item = document.createElement('div');
+            
+            // Randomly decide if it's a good or bad item
+            const isGood = Math.random() > 0.3;
+            item.className = `falling-item ${isGood ? 'good' : 'bad'}`;
+            item.textContent = isGood ? 'CATCH ME' : 'VOID';
+            
+            // Random horizontal position
+            const leftPos = Math.random() * (container.offsetWidth - 100);
+            item.style.left = `${leftPos}px`;
+            item.style.top = '-50px';
+            
+            // Add to container
+            container.appendChild(item);
+            gameItems.push(item);
+            
+            // Falling animation
+            let topPos = -50;
+            const fallInterval = setInterval(() => {
+                topPos += 2;
+                item.style.top = `${topPos}px`;
+                
+                // Remove if out of bounds
+                if (topPos > container.offsetHeight) {
+                    clearInterval(fallInterval);
+                    container.removeChild(item);
+                    gameItems = gameItems.filter(i => i !== item);
+                }
+            }, 50);
+        }
+        
+        function catchItem() {
+            const container = document.getElementById('gameContainer');
+            let caughtSomething = false;
+            
+            gameItems.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                
+                // Check if item is in the catch zone (bottom 50px)
+                if (rect.bottom >= containerRect.bottom - 50) {
+                    if (item.classList.contains('good')) {
+                        gameScore++;
+                        document.getElementById('score').textContent = gameScore;
+                        item.classList.add('caught');
+                        
+                        // Remove after animation
+                        setTimeout(() => {
+                            if (container.contains(item)) {
+                                container.removeChild(item);
+                            }
+                            gameItems = gameItems.filter(i => i !== item);
+                        }, 500);
+                        
+                        caughtSomething = true;
+                        
+                        // Check if game is complete
+                        if (gameScore >= 8) {
+                            clearInterval(gameInterval);
+                            setTimeout(nextStage, 1000);
+                        }
+                    } else if (item.classList.contains('bad')) {
+                        // VOID item - game over effect
+                        item.style.backgroundColor = '#f00';
+                        item.textContent = 'VOIDED!';
+                        
+                        setTimeout(() => {
+                            if (container.contains(item)) {
+                                container.removeChild(item);
+                            }
+                            gameItems = gameItems.filter(i => i !== item);
+                        }, 500);
+                    }
+                }
+            });
+            
+            if (!caughtSomething) {
+                // Visual feedback for tap
+                document.getElementById('actionBtn').style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    document.getElementById('actionBtn').style.transform = 'scale(1)';
+                }, 100);
+            }
+        }
+        
+        // Stage 4: Reward
+        function initStage4() {
+            document.getElementById('shopBtn').addEventListener('click', function() {
+                window.location.href = 'https://notthebestplacetobuystuff.in?discount=2101SURVIVOR';
+            });
+            
+            document.getElementById('spotifyBtn').addEventListener('click', function() {
+                // In a real implementation, this would play a sound
+                alert("(Imagine a funny sound playing here)");
+            });
+            
+            // Set help content for this stage
+            document.getElementById('helpContent').textContent = 
+                "Use your discount code at our shop! The tiny secret button plays a surprise sound.";
+        }
+        
+        // Help system
+        document.getElementById('helpToggle').addEventListener('click', function() {
+            document.getElementById('helpPanel').classList.add('active');
+        });
+        
+        document.getElementById('closeHelp').addEventListener('click', function() {
+            document.getElementById('helpPanel').classList.remove('active');
+        });
+        
+        // Audio controls
+        document.getElementById('audioToggle').addEventListener('click', function() {
+            if (isAudioPlaying) {
+                bgAudio.pause();
+                isAudioPlaying = false;
+                this.textContent = "🔇";
+            } else {
+                bgAudio.play().then(() => {
+                    isAudioPlaying = true;
+                    this.textContent = "🔊";
+                }).catch(() => {
+                    // Audio failed to play, likely due to autoplay restrictions
+                    this.textContent = "🔇";
+                });
+            }
+        });
+        
+        // Resume progress if returning
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedProgress = localStorage.getItem('receiptProgress');
+            if (savedProgress && savedProgress > 0) {
+                currentStage = parseInt(savedProgress);
+                document.getElementById('stage0').classList.remove('active');
+                document.getElementById(`stage${currentStage}`).classList.add('active');
+                updateProgress();
+                initStage(currentStage);
+            } else {
                 initStage(0);
-            }, 3000);
+            }
+            
+            // Try to start audio after user interaction
+            document.addEventListener('click', function initAudio() {
+                bgAudio.play().then(() => {
+                    isAudioPlaying = true;
+                    document.getElementById('audioToggle').textContent = "🔊";
+                }).catch(() => {});
+                document.removeEventListener('click', initAudio);
+            });
         });
     </script>
-    
-    <!-- html2canvas library for receipt download -->
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>
