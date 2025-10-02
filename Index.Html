@@ -1,1419 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Infinite Receipt</title>
-    <style>
-        /* Base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            background-color: #0a0a0a;
-            color: #fff;
-            font-family: 'Courier New', monospace;
-            overflow: hidden;
-            min-height: 100vh;
-            position: relative;
-            cursor: none;
-            background-image: 
-                linear-gradient(rgba(10, 10, 10, 0.9), rgba(10, 10, 10, 0.9)),
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(20, 20, 20, 0.3) 2px, rgba(20, 20, 20, 0.3) 4px);
-        }
-        
-        /* Custom cursor */
-        .cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle, #0ff 0%, transparent 70%);
-            border-radius: 50%;
-            z-index: 10000;
-            pointer-events: none;
-            mix-blend-mode: difference;
-            transition: transform 0.1s;
-        }
-        
-        .cursor.scanning {
-            width: 100px;
-            height: 5px;
-            background: linear-gradient(90deg, transparent, #0ff, transparent);
-            border-radius: 0;
-            animation: scan 2s infinite;
-        }
-        
-        @keyframes scan {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-        
-        /* Stage management */
-        .stage {
-            display: none;
-            min-height: 100vh;
-            padding: 40px 20px;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
-        
-        .active {
-            display: flex;
-        }
-        
-        /* Exit prevention overlay */
-        .exit-prevention {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .exit-prevention.active {
-            display: flex;
-        }
-        
-        /* Receipt styling */
-        .receipt {
-            background-color: #fff;
-            color: #000;
-            padding: 40px 30px;
-            position: relative;
-            overflow: hidden;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 0 50px rgba(0, 255, 255, 0.1);
-            border: 1px solid #333;
-            transform: rotate(0.3deg);
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
-                repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.03) 1px, rgba(0, 0, 0, 0.03) 2px);
-        }
-        
-        .receipt::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 5px,
-                #000 5px,
-                #000 10px
-            );
-        }
-        
-        .receipt::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 5px,
-                #000 5px,
-                #000 10px
-            );
-        }
-        
-        /* Glitch effects */
-        .glitch {
-            position: relative;
-        }
-        
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .glitch::before {
-            left: 2px;
-            text-shadow: -1px 0 red;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 3s infinite linear alternate-reverse;
-        }
-        
-        .glitch::after {
-            left: -2px;
-            text-shadow: 1px 0 blue;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim2 3s infinite linear alternate-reverse;
-        }
-        
-        @keyframes glitch-anim {
-            0% { clip: rect(42px, 9999px, 44px, 0); }
-            5% { clip: rect(12px, 9999px, 59px, 0); }
-            10% { clip: rect(48px, 9999px, 29px, 0); }
-            15% { clip: rect(42px, 9999px, 73px, 0); }
-            20% { clip: rect(63px, 9999px, 27px, 0); }
-            25% { clip: rect(34px, 9999px, 55px, 0); }
-            30% { clip: rect(86px, 9999px, 73px, 0); }
-            35% { clip: rect(20px, 9999px, 20px, 0); }
-            40% { clip: rect(26px, 9999px, 60px, 0); }
-            45% { clip: rect(25px, 9999px, 66px, 0); }
-            50% { clip: rect(57px, 9999px, 98px, 0); }
-            55% { clip: rect(5px, 9999px, 46px, 0); }
-            60% { clip: rect(82px, 9999px, 31px, 0); }
-            65% { clip: rect(54px, 9999px, 27px, 0); }
-            70% { clip: rect(28px, 9999px, 99px, 0); }
-            75% { clip: rect(45px, 9999px, 69px, 0); }
-            80% { clip: rect(23px, 9999px, 85px, 0); }
-            85% { clip: rect(54px, 9999px, 84px, 0); }
-            90% { clip: rect(45px, 9999px, 47px, 0); }
-            95% { clip: rect(37px, 9999px, 20px, 0); }
-            100% { clip: rect(4px, 9999px, 91px, 0); }
-        }
-        
-        @keyframes glitch-anim2 {
-            0% { clip: rect(65px, 9999px, 100px, 0); }
-            5% { clip: rect(52px, 9999px, 74px, 0); }
-            10% { clip: rect(79px, 9999px, 85px, 0); }
-            15% { clip: rect(75px, 9999px, 5px, 0); }
-            20% { clip: rect(67px, 9999px, 61px, 0); }
-            25% { clip: rect(14px, 9999px, 79px, 0); }
-            30% { clip: rect(1px, 9999px, 66px, 0); }
-            35% { clip: rect(86px, 9999px, 30px, 0); }
-            40% { clip: rect(23px, 9999px, 98px, 0); }
-            45% { clip: rect(85px, 9999px, 72px, 0); }
-            50% { clip: rect(71px, 9999px, 75px, 0); }
-            55% { clip: rect(2px, 9999px, 48px, 0); }
-            60% { clip: rect(30px, 9999px, 16px, 0); }
-            65% { clip: rect(59px, 9999px, 50px, 0); }
-            70% { clip: rect(41px, 9999px, 62px, 0); }
-            75% { clip: rect(2px, 9999px, 82px, 0); }
-            80% { clip: rect(47px, 9999px, 73px, 0); }
-            85% { clip: rect(3px, 9999px, 27px, 0); }
-            90% { clip: rect(26px, 9999px, 55px, 0); }
-            95% { clip: rect(42px, 9999px, 97px, 0); }
-            100% { clip: rect(38px, 9999px, 49px, 0); }
-        }
-        
-        .flicker {
-            animation: flicker 2s linear infinite;
-        }
-        
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        /* Button styles */
-        button {
-            background-color: #000;
-            color: #fff;
-            border: 2px solid #fff;
-            padding: 15px 30px;
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            cursor: pointer;
-            margin: 10px 5px;
-            transition: all 0.3s;
-            border-radius: 0;
-            min-height: 60px;
-            min-width: 200px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        button:hover, button:focus {
-            background-color: #fff;
-            color: #000;
-            outline: 3px solid #0ff;
-        }
-        
-        .primary-btn {
-            background-color: #0ff;
-            color: #000;
-            font-weight: bold;
-            border: 2px solid #0ff;
-        }
-        
-        .primary-btn:hover, .primary-btn:focus {
-            background-color: #000;
-            color: #0ff;
-        }
-        
-        /* Receipt items */
-        .receipt-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px dashed #ccc;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 18px;
-            min-height: 55px;
-            align-items: center;
-            position: relative;
-        }
-        
-        .receipt-item:hover, .receipt-item:focus {
-            background-color: #f0f0f0;
-        }
-        
-        .receipt-item.crossed-out {
-            text-decoration: line-through;
-            opacity: 0.5;
-            background-color: #f9f9f9;
-        }
-        
-        .receipt-item.crossed-out::after {
-            content: "❌";
-            position: absolute;
-            right: -25px;
-            color: red;
-        }
-        
-        .receipt-item.golden {
-            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
-            color: #000;
-            font-weight: bold;
-            animation: golden-glow 2s infinite alternate;
-        }
-        
-        @keyframes golden-glow {
-            0% { box-shadow: 0 0 5px gold; }
-            100% { box-shadow: 0 0 20px gold, 0 0 30px orange; }
-        }
-        
-        /* Message popup */
-        .message-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #000;
-            color: #fff;
-            padding: 30px;
-            border: 2px solid #0ff;
-            z-index: 1000;
-            text-align: center;
-            display: none;
-            max-width: 400px;
-            animation: pop-in 0.3s forwards;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-        }
-        
-        @keyframes pop-in {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-        
-        /* Game elements */
-        .game-container {
-            position: relative;
-            height: 500px;
-            width: 100%;
-            max-width: 600px;
-            border: 2px solid #fff;
-            margin: 20px auto;
-            overflow: hidden;
-            background: #111;
-        }
-        
-        .falling-item {
-            position: absolute;
-            padding: 12px 18px;
-            border-radius: 3px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.1s;
-            text-align: center;
-            min-width: 140px;
-            z-index: 10;
-        }
-        
-        .falling-item.good {
-            background-color: #0f0;
-            color: #000;
-            border: 1px solid #0a0;
-        }
-        
-        .falling-item.bad {
-            background-color: #f00;
-            color: #fff;
-            border: 1px solid #a00;
-        }
-        
-        .falling-item.rare {
-            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
-            color: #000;
-            font-weight: bold;
-            animation: golden-glow 2s infinite alternate;
-        }
-        
-        .falling-item.caught {
-            animation: caught 0.5s forwards;
-        }
-        
-        @keyframes caught {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(0); opacity: 0; }
-        }
-        
-        .basket {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 60px;
-            background: #0ff;
-            border: 2px solid #000;
-            z-index: 20;
-        }
-        
-        .score {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 8px 15px;
-            border-radius: 5px;
-            z-index: 30;
-            font-size: 18px;
-        }
-        
-        .progress-container {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            width: 200px;
-            height: 20px;
-            background: #333;
-            border: 1px solid #0ff;
-            z-index: 30;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: #0ff;
-            transition: width 0.3s ease;
-        }
-        
-        /* Text styles */
-        h1 {
-            font-size: 42px;
-            margin-bottom: 30px;
-            text-align: center;
-            line-height: 1.2;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-        
-        h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-        
-        p {
-            font-size: 18px;
-            margin-bottom: 20px;
-            max-width: 600px;
-            line-height: 1.5;
-        }
-        
-        .instruction {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-            max-width: 500px;
-            border-left: 3px solid #0ff;
-        }
-        
-        /* Infinite receipt scroll */
-        .infinite-receipt {
-            height: 500px;
-            width: 100%;
-            max-width: 500px;
-            overflow: hidden;
-            position: relative;
-            margin: 20px auto;
-            border: 2px solid #fff;
-            background: #fff;
-            color: #000;
-        }
-        
-        .receipt-content {
-            position: absolute;
-            top: 100%;
-            width: 100%;
-            padding: 20px;
-            animation: scroll-up 120s linear forwards;
-        }
-        
-        @keyframes scroll-up {
-            0% { top: 100%; }
-            100% { top: -5000px; }
-        }
-        
-        /* Glitch overlay */
-        .glitch-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(rgba(255,0,0,0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,0,0,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            pointer-events: none;
-            opacity: 0;
-            z-index: 999;
-            animation: static 0.2s infinite;
-        }
-        
-        @keyframes static {
-            0% { background-position: 0 0; }
-            100% { background-position: 20px 20px; }
-        }
-        
-        /* Printer animation */
-        .printer-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .printer-animation.active {
-            display: flex;
-        }
-        
-        .printer-output {
-            width: 100%;
-            max-width: 500px;
-            background: #fff;
-            color: #000;
-            padding: 40px 30px;
-            position: relative;
-            overflow: hidden;
-            font-family: 'Courier New', monospace;
-            border: 1px solid #333;
-        }
-        
-        .printer-line {
-            opacity: 0;
-            animation: print-line 0.5s forwards;
-        }
-        
-        @keyframes print-line {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 32px;
-            }
-            
-            h2 {
-                font-size: 24px;
-            }
-            
-            p {
-                font-size: 16px;
-            }
-            
-            button {
-                padding: 12px 20px;
-                font-size: 16px;
-                min-height: 50px;
-                min-width: 160px;
-            }
-            
-            .receipt-item {
-                font-size: 16px;
-                min-height: 50px;
-            }
-            
-            .game-container {
-                height: 400px;
-            }
-        }
-        
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>The Infinite Receipt</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #0f0;
+      font-family: monospace;
+      overflow: hidden;
+    }
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .active { display: block; }
+    .receipt {
+      background: #fff;
+      color: #000;
+      display: inline-block;
+      padding: 20px;
+      text-align: left;
+      font-size: 14px;
+      width: 300px;
+      border: 2px dashed #000;
+    }
+    .item { cursor: pointer; }
+    .crossed { text-decoration: line-through; color: red; }
+    .glitch {
+      font-size: 20px;
+      color: #f0f;
+      animation: flicker 0.2s infinite;
+    }
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    #scrolling {
+      color: #0f0;
+      font-size: 16px;
+      white-space: pre-line;
+      animation: scroll 60s linear infinite;
+    }
+    @keyframes scroll {
+      0% { transform: translateY(100%); }
+      100% { transform: translateY(-500%); }
+    }
+    #gameCanvas {
+      background: #222;
+      display: block;
+      margin: 20px auto;
+      border: 2px solid #0f0;
+    }
+  </style>
 </head>
 <body>
-    <!-- Custom cursor -->
-    <div class="cursor"></div>
-    
-    <!-- Glitch overlay -->
-    <div class="glitch-overlay" id="glitchOverlay"></div>
-    
-    <!-- Exit prevention overlay -->
-    <div class="exit-prevention" id="exitPrevention">
-        <div class="receipt">
-            <h2>TRANSACTION IN PROGRESS</h2>
-            <p>================================</p>
-            <p>You cannot leave the counter without your change.</p>
-            <p>Please complete the checkout process.</p>
-            <p>================================</p>
-            <button class="primary-btn" id="continueTransaction">CONTINUE TRANSACTION</button>
-        </div>
-    </div>
-    
-    <!-- Message popup -->
-    <div class="message-popup" id="messagePopup">
-        <p id="popupMessage"></p>
-        <button class="primary-btn" id="closePopup">CONTINUE</button>
-    </div>
-    
-    <!-- Stage 0: Receipt Item Crossing -->
-    <div id="stage0" class="stage active">
-        <h1 class="glitch flicker" data-text="THE INFINITE RECEIPT">THE INFINITE RECEIPT</h1>
-        
-        <div class="receipt" id="crossingReceipt">
-            <h2>NOT THE BEST™ STORE</h2>
-            <p>================================</p>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Shoelace of Enlightenment</span>
-                <span>₹2,499</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Digital Oxygen</span>
-                <span>₹499</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Cloud Storage for Dreams</span>
-                <span>₹1,299</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Broken Socks</span>
-                <span>₹4,999</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Existential Crisis</span>
-                <span>PRICELESS</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>WiFi Signal Booster</span>
-                <span>₹799</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Invisible Ink Cartridge</span>
-                <span>₹2,499</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Time Travel Surcharge</span>
-                <span>₹9,999</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Digital Footprint Cleaner</span>
-                <span>₹3,999</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Privacy Tax</span>
-                <span>₹1,200</span>
-            </div>
-            
-            <p>================================</p>
-            <p>Subtotal: You Regret This</p>
-            <p>Tax: Pain (18%)</p>
-            <p>Handling Fee: 21.01%</p>
-            <p>Cashier: Nobody</p>
-            <p>================================</p>
-            <p class="glitch" data-text="TOTAL: Your Soul">TOTAL: Your Soul</p>
-            <p>Tip: Don't.</p>
-            <p>================================</p>
-        </div>
-        
-        <p class="instruction">Click items to cross them out and reveal hidden messages</p>
-        <p id="selectionMessage">Items crossed: <span id="crossedCount">0</span>/10</p>
-    </div>
-    
-    <!-- Stage 1: Glitch Uncover -->
-    <div id="stage1" class="stage">
-        <h1 class="flicker">SYSTEM OVERRIDE DETECTED</h1>
-        
-        <div class="receipt glitch">
-            <h2>CRITICAL SYSTEM ERROR</h2>
-            <p>================================</p>
-            <p>Receipt integrity compromised</p>
-            <p>Glitch pattern detected</p>
-            <p>System override required</p>
-            <p>================================</p>
-            <p>FIX THE GLITCH TO CONTINUE</p>
-            <p>================================</p>
-        </div>
-        
-        <button class="primary-btn" id="fixGlitchBtn">INITIATE SYSTEM REPAIR</button>
-    </div>
-    
-    <!-- Stage 2: Infinite Receipt Scroll -->
-    <div id="stage2" class="stage">
-        <h1>RECEIPT OVERFLOW DETECTED</h1>
-        
-        <div class="infinite-receipt">
-            <div class="receipt-content" id="infiniteReceiptContent">
-                <!-- Content will be generated by JavaScript -->
-            </div>
-        </div>
-        
-        <p class="instruction">Stabilizing receipt stream... Please wait</p>
-    </div>
-    
-    <!-- Stage 3: Mini Game -->
-    <div id="stage3" class="stage">
-        <h1>SYSTEM STABILIZATION REQUIRED</h1>
-        
-        <div class="game-container" id="gameContainer">
-            <div class="basket"></div>
-            <div class="score">Caught: <span id="score">0</span>/15</div>
-            <div class="progress-container">
-                <div class="progress-bar" id="gameProgress"></div>
-            </div>
-            <!-- Falling items will be generated here -->
-        </div>
-        
-        <p class="instruction">Catch falling receipt items to stabilize the system</p>
-    </div>
-    
-    <!-- Stage 4: Final Print & Redirect -->
-    <div id="stage4" class="stage">
-        <div class="printer-animation" id="printerAnimation">
-            <div class="printer-output" id="printerOutput">
-                <!-- Content will be generated by JavaScript -->
-            </div>
-        </div>
-    </div>
 
-    <script>
-        // Stage management
-        let currentStage = 0;
-        let crossedItems = 0;
-        let gameScore = 0;
-        let gameItems = [];
-        let gameInterval;
-        let usedMessages = new Set();
-        let konamiCode = [];
-        let debugMode = false;
-        
-        // Witty message bank (100+ messages)
-        const wittyMessages = [
-            "You received: 2kg of nostalgia.",
-            "Discount applied: Eternal confusion (-₹99).",
-            "Item unavailable: Love. Please restock later.",
-            "You unlocked: Grandma's secret approval coupon.",
-            "System Tax: +18% stress.",
-            "Bonus: Unused gift card (expired).",
-            "You found: A free trial of disappointment.",
-            "Reward: One slightly used compliment.",
-            "Acquired: The ability to parallel park perfectly.",
-            "Unlocked: Secret handshake with destiny.",
-            "Received: Backstage pass to your own dreams.",
-            "Found: Map to buried potential.",
-            "Awarded: Gold medal in procrastination.",
-            "Discovered: Lost remote from 2015.",
-            "Earned: PhD in overthinking.",
-            "Collected: All seven deadly WiFi signals.",
-            "Unlocked: Premium version of your personality.",
-            "Received: Time machine (batteries not included).",
-            "Found: Missing sock from laundry dimension.",
-            "Acquired: Superpower of finding parking spots.",
-            "Awarded: Certificate of adequate existence.",
-            "Discovered: Fountain of mildly interesting facts.",
-            "Unlocked: Ability to understand cats.",
-            "Received: Map of all potholes in your city.",
-            "Found: Key to happiness (misplaced immediately).",
-            "Earned: Black belt in avoiding eye contact.",
-            "Collected: Complete set of awkward moments.",
-            "Unlocked: Secret menu of life options.",
-            "Received: VIP pass to the back of the line.",
-            "Found: Instruction manual for your brain.",
-            "Acquired: Talent for burning toast perfectly.",
-            "Awarded: Medal in competitive napping.",
-            "Discovered: Lost city of found potential.",
-            "Unlocked: Ability to parallel universe hop.",
-            "Received: Coupon for one free mistake.",
-            "Found: Missing piece of life's puzzle.",
-            "Earned: Degree in advanced Netflix navigation.",
-            "Collected: All infinity stones of procrastination.",
-            "Unlocked: Premium ad-free version of reality.",
-            "Received: Map to all the best food trucks.",
-            "Found: Secret recipe for instant happiness.",
-            "Acquired: Superpower of always finding charging ports.",
-            "Awarded: Trophy for most creative excuses.",
-            "Discovered: Fountain of eternal mild satisfaction.",
-            "Unlocked: Ability to speak fluent sarcasm.",
-            "Received: Golden ticket to nowhere special.",
-            "Found: Missing motivation (slightly used).",
-            "Earned: PhD in avoiding responsibilities.",
-            "Collected: Complete set of life's cheat codes.",
-            "Unlocked: Premium subscription to existence.",
-            "Received: Map to all hidden gem restaurants.",
-            "Found: Key to unlimited potential (temporarily).",
-            "Acquired: Talent for perfect avocado selection.",
-            "Awarded: Medal in Olympic-level lounging.",
-            "Discovered: Lost art of conversation.",
-            "Unlocked: Ability to time travel 5 minutes back.",
-            "Received: Coupon for one free life do-over.",
-            "Found: Missing enthusiasm (lightly worn).",
-            "Earned: Degree in advanced social awkwardness.",
-            "Collected: All pieces of broken resolutions.",
-            "Unlocked: Premium filter for reality.",
-            "Received: VIP access to ordinary moments.",
-            "Found: Secret to eternal patience (expired).",
-            "Acquired: Superpower of finding lost TV remotes.",
-            "Awarded: Trophy for most creative life hacks.",
-            "Discovered: Fountain of mildly interesting ideas.",
-            "Unlocked: Ability to speak all languages poorly.",
-            "Received: Golden key to average experiences.",
-            "Found: Missing ambition (slightly damaged).",
-            "Earned: PhD in advanced procrastination techniques.",
-            "Collected: Complete set of life's plot twists.",
-            "Unlocked: Premium upgrade for your personality.",
-            "Received: Map to all the best viewpoints.",
-            "Found: Secret recipe for instant motivation.",
-            "Acquired: Talent for perfect parking spot timing.",
-            "Awarded: Medal in competitive relaxation.",
-            "Discovered: Lost civilization of productive people.",
-            "Unlocked: Ability to read minds (your own only).",
-            "Received: Coupon for one free brilliant idea.",
-            "Found: Missing creativity (temporarily borrowed).",
-            "Earned: Degree in advanced life navigation.",
-            "Collected: All pieces of shattered expectations.",
-            "Unlocked: Premium features for daily life.",
-            "Received: VIP pass to life's blooper reel.",
-            "Found: Key to unlimited coffee refills.",
-            "Acquired: Superpower of perfect pizza ordering.",
-            "Awarded: Trophy for most dramatic life moments.",
-            "Discovered: Fountain of eternal mild amusement.",
-            "Unlocked: Ability to predict obvious outcomes.",
-            "Received: Golden ticket to mediocre adventures.",
-            "Found: Missing sense of direction (partially).",
-            "Earned: PhD in avoiding awkward situations.",
-            "Collected: Complete set of life's ironies.",
-            "Unlocked: Premium soundtrack for your life.",
-            "Received: Map to all hidden shortcuts.",
-            "Found: Secret to perfect timing (usually wrong).",
-            "Acquired: Talent for finding four-leaf clovers.",
-            "Awarded: Medal in expert-level people watching.",
-            "Discovered: Lost art of small talk.",
-            "Unlocked: Ability to understand bureaucracy.",
-            "Received: Coupon for one free moment of clarity.",
-            "Found: Missing patience (low battery).",
-            "Earned: Degree in advanced life hacking.",
-            "Collected: All pieces of broken promises.",
-            "Unlocked: Premium lighting for your life.",
-            "Received: VIP access to ordinary miracles.",
-            "Found: Key to unlimited potential (requires charging)."
-        ];
-        
-        // Rare golden items for the infinite scroll
-        const rareItems = [
-            "Legendary Item Dropped: Half-eaten samosa",
-            "ULTRA RARE: Grandma's secret recipe",
-            "MYTHIC: One perfectly ripe avocado",
-            "LEGENDARY: The remote that never gets lost",
-            "ULTRA RARE: WiFi password that actually works",
-            "MYTHIC: Parking spot right by the entrance",
-            "LEGENDARY: Phone charger that fits perfectly",
-            "ULTRA RARE: Morning without hitting snooze",
-            "MYTHIC: Complete set of matching socks",
-            "LEGENDARY: Hot beverage at perfect temperature"
-        ];
-        
-        // Custom cursor
-        document.addEventListener('mousemove', function(e) {
-            document.querySelector('.cursor').style.left = e.pageX + 'px';
-            document.querySelector('.cursor').style.top = e.pageY + 'px';
-        });
-        
-        // Konami code for debug mode
-        document.addEventListener('keydown', function(e) {
-            konamiCode.push(e.key);
-            if (konamiCode.length > 10) konamiCode.shift();
-            
-            if (konamiCode.join('').includes('ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba')) {
-                debugMode = true;
-                showMessage("DEBUG MODE ACTIVATED. NOW YOU'RE A HACKER.");
-                console.log("Debug mode activated");
-            }
-        });
-        
-        // Show message popup
-        function showMessage(message) {
-            document.getElementById('popupMessage').textContent = message;
-            document.getElementById('messagePopup').style.display = 'block';
+<!-- Phase 1: Receipt -->
+<div id="phase1" class="screen active">
+  <h2>🧾 Your Receipt</h2>
+  <div class="receipt" id="receiptList"></div>
+  <p>Click the items that don’t belong…</p>
+</div>
+
+<!-- Phase 2: Glitch -->
+<div id="phase2" class="screen">
+  <h2 class="glitch">⚡ RECEIPT GLITCH ⚡</h2>
+  <p>System Overload! Please continue…</p>
+  <button onclick="startScroll()">Fix Glitch</button>
+</div>
+
+<!-- Phase 3: Scrolling Receipt -->
+<div id="phase3" class="screen">
+  <h2>📜 Infinite Receipt Printing…</h2>
+  <div id="scrolling"></div>
+</div>
+
+<!-- Phase 4: Game -->
+<div id="phase4" class="screen">
+  <h2>🎮 Catch the Falling Items</h2>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <p id="scoreText">Score: 0 / 10</p>
+</div>
+
+<!-- Phase 5: Redirect -->
+<div id="phase5" class="screen">
+  <h2>✅ Transaction Complete</h2>
+  <p>Total Due: 0. Your curiosity.</p>
+  <p>Redirecting to brand…</p>
+</div>
+
+<script>
+  // ------------------ WITTY MESSAGE BANK ------------------
+  const receiptMessages = [
+    "You received: 2kg of nostalgia.",
+    "Discount applied: Eternal confusion (-₹99).",
+    "Item unavailable: Love. Please restock later.",
+    "Added: 1 spoon of chaos.",
+    "Warranty void: Common sense.",
+    "You unlocked: Grandma’s secret approval coupon.",
+    "Promo code: CRYMORE2025 applied.",
+    "You purchased: A slightly used dream.",
+    "Tax: +18% stress.",
+    "Error: Out of patience.",
+    "Bundle pack: 3 regrets + 1 free disappointment.",
+    "Subscription renewed: Anxiety Prime.",
+    "Free trial ended: Happiness (expired).",
+    "Cashback: 0 rupees.",
+    "Special offer: Free awkward silence.",
+    "Returned item: Confidence (damaged).",
+    "Exclusive: Rare air particle.",
+    "Congratulations! You bought nothing.",
+    "Oops. You ordered pineapple on pizza again.",
+    "Discount coupon: Half-off optimism.",
+    "Free add-on: Existential dread.",
+    "Limited stock: Hope (sold out).",
+    "Error code: EGO_TOO_HIGH.",
+    "Random reward: 1 mosquito bite.",
+    "Exclusive bonus: 5 minutes of procrastination.",
+    "Processing fee: Your last nerve.",
+    "Restocking: Socks that vanish in dryer.",
+    "Surprise charge: Electricity bill flashback.",
+    "You received: Long queue experience.",
+    "Membership unlocked: Midnight overthinkers club.",
+    "VAT applied: Value-Added Tears.",
+    "Inventory low: Chill.",
+    "Receipt update: Confidence missing.",
+    "Hidden cost: 2 years of overthinking.",
+    "Unlocked: Fake enthusiasm pack.",
+    "Service fee: Social awkwardness.",
+    "Bundle deal: 2 lies + 1 half-truth.",
+    "Order delivered: Wrong address.",
+    "Unboxed: Eternal WiFi buffering.",
+    "Price adjusted: Sanity = priceless.",
+    "You claimed: Lifetime sarcasm license.",
+    "Late fee: Apologies not accepted.",
+    "Reward unlocked: Half-eaten samosa.",
+    "Invoice line: Patience overcharged.",
+    "Cart suggestion: Sleep. Not added.",
+    "Backordered: Motivation.",
+    "Bonus item: Fake confidence.",
+    "You found: Unread notification.",
+    "Rebate: -₹1 (terms apply).",
+    "Service upgrade: Silent judgment.",
+    "Hidden fee: Mood swings.",
+    "Order shipped: Broken expectations.",
+    "Custom charge: Your last braincell.",
+    "Caution: Handle with existential crisis.",
+    "Scan applied: Spicy regret.",
+    "Bill add-on: Complicated feelings.",
+    "Special edition: Dust collector deluxe.",
+    "Extra charge: One sided love.",
+    "Applied coupon: DEALWITHIT.",
+    "Fine: Overthinking late night fee.",
+    "Back in stock: Cringe memories.",
+    "Congratulations! You unlocked disappointment DLC.",
+    "Overcharged: Free water bottle.",
+    "Caution: Emotional baggage detected.",
+    "Flash sale: Buy 1 problem, get 2 free.",
+    "Premium add-on: Background stress music.",
+    "You earned: Accidental embarrassment points.",
+    "Bill note: Please cry responsibly.",
+    "Restocking soon: Self-control.",
+    "Surcharge: Invisible pressure.",
+    "Invoice closed: Trust issues.",
+    "Delivery delayed: Inner peace.",
+    "Unlocked reward: Reused excuses.",
+    "Random gift: Unwanted advice.",
+    "Extended warranty: Lifetime cringe.",
+    "Cart update: Missing socks located.",
+    "Fee added: Emotional damage.",
+    "Reward: Half a compliment.",
+    "You found: 1 random useless cable.",
+    "Cart auto-filled: Dreams you gave up.",
+    "Surprise gift: Expired coupon.",
+    "Congratulations! You leveled up: Confused adult.",
+    "Receipt add-on: Overdue karma."
+  ];
+
+  // ------------------ PHASE 1 ------------------
+  const receiptList = document.getElementById("receiptList");
+  let clicked = 0;
+
+  function generateReceipt() {
+    for (let i=0; i<10; i++) {
+      let div = document.createElement("div");
+      div.className = "item";
+      div.innerText = "Item " + (i+1);
+      div.onclick = () => crossItem(div);
+      receiptList.appendChild(div);
+    }
+  }
+
+  function crossItem(el) {
+    if (!el.classList.contains("crossed")) {
+      el.classList.add("crossed");
+      let msg = receiptMessages[Math.floor(Math.random() * receiptMessages.length)];
+      el.innerText = el.innerText + " → " + msg;
+      clicked++;
+      if (clicked >= 5) {
+        document.getElementById("phase1").classList.remove("active");
+        document.getElementById("phase2").classList.add("active");
+      }
+    }
+  }
+
+  // ------------------ PHASE 2 ------------------
+  function startScroll() {
+    document.getElementById("phase2").classList.remove("active");
+    document.getElementById("phase3").classList.add("active");
+    let scrollDiv = document.getElementById("scrolling");
+    let content = "";
+    for (let i=0; i<200; i++) {
+      let msg = receiptMessages[Math.floor(Math.random() * receiptMessages.length)];
+      content += msg + "\n";
+    }
+    scrollDiv.innerText = content;
+    setTimeout(startGame, 15000); // scroll 15s then game
+  }
+
+  // ------------------ PHASE 4: GAME ------------------
+  let score = 0;
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  let player = {x:180,y:370,w:40,h:20};
+  let items = [];
+
+  function startGame() {
+    document.getElementById("phase3").classList.remove("active");
+    document.getElementById("phase4").classList.add("active");
+    document.addEventListener("keydown", movePlayer);
+    setInterval(spawnItem, 1000);
+    requestAnimationFrame(updateGame);
+  }
+
+  function movePlayer(e) {
+    if (e.key==="ArrowLeft") player.x -= 20;
+    if (e.key==="ArrowRight") player.x += 20;
+  }
+
+  function spawnItem() {
+    items.push({x:Math.random()*380, y:0, text: receiptMessages[Math.floor(Math.random()*receiptMessages.length)]});
+  }
+
+  function updateGame() {
+    ctx.clearRect(0,0,400,400);
+    ctx.fillStyle="#0f0";
+    ctx.fillRect(player.x,player.y,player.w,player.h);
+
+    for (let i=0;i<items.length;i++) {
+      let it=items[i];
+      ctx.fillStyle="#fff";
+      ctx.fillText("⬇", it.x, it.y);
+      it.y+=2;
+      if (it.y>370 && it.x>player.x && it.x<player.x+player.w) {
+        score++;
+        items.splice(i,1);
+        document.getElementById("scoreText").innerText="Score: "+score+" / 10";
+        if (score>=10) {
+          endGame();
+          return;
         }
-        
-        document.getElementById('closePopup').addEventListener('click', function() {
-            document.getElementById('messagePopup').style.display = 'none';
-        });
-        
-        // Trigger glitch effect
-        function triggerGlitch() {
-            const overlay = document.getElementById('glitchOverlay');
-            overlay.style.opacity = '0.3';
-            setTimeout(() => {
-                overlay.style.opacity = '0';
-            }, 200);
-        }
-        
-        // Get random witty message (ensuring no repeats in session)
-        function getRandomMessage() {
-            if (usedMessages.size >= wittyMessages.length) {
-                usedMessages.clear(); // Reset if we've used all messages
-            }
-            
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * wittyMessages.length);
-            } while (usedMessages.has(randomIndex));
-            
-            usedMessages.add(randomIndex);
-            return wittyMessages[randomIndex];
-        }
-        
-        // Show exit prevention
-        function showExitPrevention() {
-            document.getElementById('exitPrevention').classList.add('active');
-        }
-        
-        document.getElementById('continueTransaction').addEventListener('click', function() {
-            document.getElementById('exitPrevention').classList.remove('active');
-        });
-        
-        // Prevent back button
-        history.pushState(null, null, document.URL);
-        window.addEventListener('popstate', function() {
-            history.pushState(null, null, document.URL);
-            showExitPrevention();
-        });
-        
-        // Prevent leaving the page
-        window.addEventListener('beforeunload', function(e) {
-            if (currentStage < 4) {
-                e.preventDefault();
-                e.returnValue = '';
-                showExitPrevention();
-            }
-        });
-        
-        // Random fake error messages
-        function showRandomError() {
-            const errors = [
-                "Are you still there, customer?",
-                "Receipt overheating. Cool down recommended.",
-                "Restart required. Just kidding.",
-                "System calibrating. Please hold your breath.",
-                "Processing... Processing... Still processing...",
-                "Cashier.exe has stopped working",
-                "Memory leak detected in receipt printer",
-                "Please wait while we find the manager",
-                "Unexpected item in bagging area",
-                "Card declined. Try again with your soul.",
-                "Insufficient funds in your karma account",
-                "Please swipe card again. Slower this time.",
-                "Network connection to reality lost",
-                "Receipt paper jammed with existential dread",
-                "Please wait for the next available cashier",
-                "Price check needed for your self-worth",
-                "Barcode unreadable. Try wiping off the tears.",
-                "Payment processing... Please be patient",
-                "System updating to version 2.0 of your life",
-                "Receipt printer out of ink. Using blood instead."
-            ];
-            
-            const error = errors[Math.floor(Math.random() * errors.length)];
-            showMessage(error);
-            
-            // Randomly trigger glitch
-            if (Math.random() > 0.7) {
-                triggerGlitch();
-            }
-        }
-        
-        // Set up stage 0: Receipt item crossing
-        function setupStage0() {
-            const receiptItems = document.querySelectorAll('#crossingReceipt .receipt-item');
-            const crossedCount = document.getElementById('crossedCount');
-            
-            receiptItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    if (!this.classList.contains('crossed-out')) {
-                        this.classList.add('crossed-out');
-                        crossedItems++;
-                        crossedCount.textContent = crossedItems;
-                        
-                        // Show random witty message
-                        showMessage(getRandomMessage());
-                        
-                        // Randomly trigger glitch
-                        if (Math.random() > 0.8) {
-                            triggerGlitch();
-                        }
-                        
-                        // Show random error occasionally
-                        if (Math.random() > 0.9) {
-                            setTimeout(showRandomError, 1000);
-                        }
-                        
-                        // Move to next stage after crossing all items
-                        if (crossedItems >= receiptItems.length) {
-                            setTimeout(() => {
-                                showMessage("SYSTEM OVERRIDE DETECTED. PREPARE FOR GLITCH.");
-                                setTimeout(() => {
-                                    moveToStage(1);
-                                }, 3000);
-                            }, 1000);
-                        }
-                    }
-                });
-            });
-            
-            // Show random errors occasionally
-            setInterval(() => {
-                if (Math.random() > 0.95) {
-                    showRandomError();
-                }
-            }, 10000);
-        }
-        
-        // Set up stage 1: Glitch uncover
-        function setupStage1() {
-            document.getElementById('fixGlitchBtn').addEventListener('click', function() {
-                showMessage("INITIATING SYSTEM REPAIR...");
-                
-                // Simulate repair process with glitches
-                let repairProgress = 0;
-                const repairInterval = setInterval(() => {
-                    repairProgress += Math.random() * 15;
-                    
-                    if (repairProgress >= 100) {
-                        clearInterval(repairInterval);
-                        showMessage("SYSTEM REPAIRED. PREPARING RECEIPT OVERFLOW...");
-                        setTimeout(() => {
-                            moveToStage(2);
-                        }, 3000);
-                    }
-                    
-                    // Trigger glitches during repair
-                    if (Math.random() > 0.7) {
-                        triggerGlitch();
-                    }
-                }, 500);
-            });
-        }
-        
-        // Set up stage 2: Infinite receipt scroll
-        function setupStage2() {
-            const receiptContent = document.getElementById('infiniteReceiptContent');
-            
-            // Generate infinite receipt content
-            let receiptHTML = `
-                <h2>NOT THE BEST™ STORE</h2>
-                <p>================================</p>
-            `;
-            
-            // Generate a long list of absurd items
-            const absurdItems = [
-                "1 unit of optimism", "99 bottles of boredom", "Subscription to regret (auto-renewed)",
-                "Bag of lost hopes", "Jar of existential dread", "Can of whoop-ass (empty)",
-                "Bottle of liquid courage", "Box of broken dreams", "Packet of instant karma",
-                "Tube of crushed ambitions", "Carton of spoiled milk", "Case of identity crisis",
-                "Bag of mixed signals", "Jar of pickled potential", "Can of compressed time",
-                "Bottle of digital tears", "Box of unread books", "Packet of social anxiety",
-                "Tube of creative block", "Carton of expired motivation", "Case of imposter syndrome",
-                "Bag of awkward silence", "Jar of unsent messages", "Can of empty promises",
-                "Bottle of midnight oil", "Box of unfinished projects", "Packet of procrastination",
-                "Tube of burnt out", "Carton of caffeine dependency", "Case of analysis paralysis",
-                "Bag of good intentions", "Jar of bitter memories", "Can of sour grapes",
-                "Bottle of sweet revenge", "Box of Pandora", "Packet of Pandora's hope",
-                "Tube of slippery slope", "Carton of cognitive dissonance", "Case of confirmation bias",
-                "Bag of red herrings", "Jar of white lies", "Can of blue moons",
-                "Bottle of green envy", "Box of black swans", "Packet of grey areas",
-                "Tube of silver linings", "Carton of golden opportunities", "Case of rose-colored glasses"
-            ];
-            
-            // Add items to receipt
-            for (let i = 0; i < 200; i++) {
-                const item = absurdItems[Math.floor(Math.random() * absurdItems.length)];
-                const price = (Math.random() * 1000).toFixed(2);
-                
-                // Occasionally add a rare golden item
-                if (Math.random() > 0.97) {
-                    const rareItem = rareItems[Math.floor(Math.random() * rareItems.length)];
-                    receiptHTML += `
-                        <div class="receipt-item golden">
-                            <span>${rareItem}</span>
-                            <span>FREE</span>
-                        </div>
-                    `;
-                } else {
-                    receiptHTML += `
-                        <div class="receipt-item">
-                            <span>${item}</span>
-                            <span>₹${price}</span>
-                        </div>
-                    `;
-                }
-                
-                // Add receipt separators occasionally
-                if (i % 15 === 0 && i > 0) {
-                    receiptHTML += `<p>================================</p>`;
-                    receiptHTML += `<p>Subtotal: Still calculating...</p>`;
-                    receiptHTML += `<p>================================</p>`;
-                }
-            }
-            
-            receiptHTML += `
-                <p>================================</p>
-                <p>Subtotal: ∞</p>
-                <p>Tax: Your Sanity (100%)</p>
-                <p>Handling Fee: 99.99%</p>
-                <p>Cashier: The Void</p>
-                <p>================================</p>
-                <p class="glitch" data-text="TOTAL: Everything">TOTAL: Everything</p>
-                <p>Tip: Your Firstborn</p>
-                <p>================================</p>
-            `;
-            
-            receiptContent.innerHTML = receiptHTML;
-            
-            // Move to next stage after scroll completes
-            setTimeout(() => {
-                showMessage("RECEIPT OVERFLOW STABILIZED. INITIATING MINI-GAME...");
-                setTimeout(() => {
-                    moveToStage(3);
-                }, 3000);
-            }, 120000); // 2 minutes
-        }
-        
-        // Set up stage 3: Mini-game
-        function setupStage3() {
-            gameScore = 0;
-            document.getElementById('score').textContent = gameScore;
-            document.getElementById('gameProgress').style.width = '0%';
-            
-            const gameContainer = document.getElementById('gameContainer');
-            const basket = document.querySelector('.basket');
-            
-            // Basket movement
-            let basketPosition = 50; // percentage
-            let isMovingLeft = false;
-            let isMovingRight = false;
-            
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowLeft') isMovingLeft = true;
-                if (e.key === 'ArrowRight') isMovingRight = true;
-            });
-            
-            document.addEventListener('keyup', function(e) {
-                if (e.key === 'ArrowLeft') isMovingLeft = false;
-                if (e.key === 'ArrowRight') isMovingRight = false;
-            });
-            
-            // Game loop for basket movement
-            function updateBasket() {
-                if (isMovingLeft && basketPosition > 5) basketPosition -= 2;
-                if (isMovingRight && basketPosition < 95) basketPosition += 2;
-                
-                basket.style.left = `${basketPosition}%`;
-                requestAnimationFrame(updateBasket);
-            }
-            
-            updateBasket();
-            
-            // Item generation
-            function createFallingItem() {
-                const item = document.createElement('div');
-                const itemTypes = ['good', 'bad', 'rare'];
-                const itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
-                
-                item.classList.add('falling-item', itemType);
-                
-                // Set random position
-                const leftPos = Math.random() * 80 + 10; // 10% to 90%
-                item.style.left = `${leftPos}%`;
-                item.style.top = '-50px';
-                
-                // Set item text based on type
-                if (itemType === 'good') {
-                    const goodItems = [
-                        "Free WiFi", "Extra Life", "Bonus Points", "Time Extension",
-                        "Power Boost", "Health Pack", "Shield", "Multiplier"
-                    ];
-                    item.textContent = goodItems[Math.floor(Math.random() * goodItems.length)];
-                } else if (itemType === 'bad') {
-                    const badItems = [
-                        "Virus", "Glitch", "Error", "Crash",
-                        "Lag", "Freeze", "Corruption", "Overheat"
-                    ];
-                    item.textContent = badItems[Math.floor(Math.random() * badItems.length)];
-                } else {
-                    item.textContent = rareItems[Math.floor(Math.random() * rareItems.length)];
-                }
-                
-                gameContainer.appendChild(item);
-                
-                // Animation
-                let topPos = -50;
-                const fallSpeed = 1 + Math.random() * 2;
-                
-                const fallInterval = setInterval(() => {
-                    topPos += fallSpeed;
-                    item.style.top = `${topPos}px`;
-                    
-                    // Check if item is caught
-                    const basketRect = basket.getBoundingClientRect();
-                    const itemRect = item.getBoundingClientRect();
-                    
-                    if (
-                        topPos > gameContainer.offsetHeight - 100 &&
-                        itemRect.left < basketRect.right &&
-                        itemRect.right > basketRect.left
-                    ) {
-                        // Item caught
-                        clearInterval(fallInterval);
-                        item.classList.add('caught');
-                        
-                        if (itemType === 'good' || itemType === 'rare') {
-                            gameScore++;
-                            document.getElementById('score').textContent = gameScore;
-                            
-                            // Update progress
-                            const progress = (gameScore / 15) * 100;
-                            document.getElementById('gameProgress').style.width = `${progress}%`;
-                            
-                            // Show caught message
-                            const caughtMessages = [
-                                "You caught: A free trial of disappointment.",
-                                "You caught: Eternal WiFi password.",
-                                "You caught: Bonus: Unused gift card (expired).",
-                                "You caught: One slightly used compliment.",
-                                "You caught: Map to buried potential.",
-                                "You caught: Gold medal in procrastination.",
-                                "You caught: Lost remote from 2015.",
-                                "You caught: PhD in overthinking.",
-                                "You caught: All seven deadly WiFi signals.",
-                                "You caught: Premium version of your personality."
-                            ];
-                            
-                            if (Math.random() > 0.7) {
-                                showMessage(caughtMessages[Math.floor(Math.random() * caughtMessages.length)]);
-                            }
-                            
-                            // Check if game is complete
-                            if (gameScore >= 15) {
-                                clearInterval(gameInterval);
-                                showMessage("SYSTEM STABILIZED. PREPARING FINAL PRINT...");
-                                setTimeout(() => {
-                                    moveToStage(4);
-                                }, 3000);
-                            }
-                        } else {
-                            // Bad item caught
-                            showMessage("SYSTEM CORRUPTION DETECTED. STABILITY DECREASED.");
-                            if (gameScore > 0) gameScore--;
-                            document.getElementById('score').textContent = gameScore;
-                            
-                            const progress = (gameScore / 15) * 100;
-                            document.getElementById('gameProgress').style.width = `${progress}%`;
-                        }
-                        
-                        setTimeout(() => {
-                            item.remove();
-                        }, 500);
-                    }
-                    
-                    // Remove if missed
-                    if (topPos > gameContainer.offsetHeight) {
-                        clearInterval(fallInterval);
-                        item.remove();
-                    }
-                }, 16); // ~60fps
-            }
-            
-            // Start item generation
-            gameInterval = setInterval(createFallingItem, 1000);
-            
-            // Random glitches during game
-            setInterval(() => {
-                if (Math.random() > 0.9) {
-                    triggerGlitch();
-                }
-            }, 5000);
-        }
-        
-        // Set up stage 4: Final print and redirect
-        function setupStage4() {
-            const printerOutput = document.getElementById('printerOutput');
-            const printerAnimation = document.getElementById('printerAnimation');
-            
-            printerAnimation.classList.add('active');
-            
-            // Printer animation content
-            const printLines = [
-                "==========================================",
-                "           TRANSACTION COMPLETE          ",
-                "==========================================",
-                "",
-                "Thank you for shopping at",
-                "NOT THE BEST™ STORE",
-                "",
-                "Items Purchased:",
-                " - Your Time",
-                " - Your Attention",
-                " - Your Curiosity",
-                "",
-                "Subtotal: Your Patience",
-                "Tax: 18% Confusion",
-                "Handling: 21% Existential Dread",
-                "",
-                "==========================================",
-                "TOTAL: 0. Your curiosity.",
-                "==========================================",
-                "",
-                "Change: A slightly used sense of wonder",
-                "",
-                "Cashier: The Internet",
-                "Date: Now",
-                "Time: Always",
-                "",
-                "==========================================",
-                "          REDIRECTING TO BRAND...         ",
-                "==========================================",
-                "",
-                "Thank you for your participation.",
-                "Your data has been processed.",
-                "Your soul has been scanned.",
-                "Your existence has been noted.",
-                "",
-                "Redirecting in 5..."
-            ];
-            
-            let currentLine = 0;
-            
-            function printNextLine() {
-                if (currentLine < printLines.length) {
-                    const line = document.createElement('p');
-                    line.classList.add('printer-line');
-                    line.textContent = printLines[currentLine];
-                    printerOutput.appendChild(line);
-                    currentLine++;
-                    
-                    setTimeout(printNextLine, 500);
-                } else {
-                    // Countdown and redirect
-                    let countdown = 5;
-                    const countdownInterval = setInterval(() => {
-                        if (countdown > 0) {
-                            const countdownLine = document.createElement('p');
-                            countdownLine.classList.add('printer-line');
-                            countdownLine.textContent = `Redirecting in ${countdown}...`;
-                            printerOutput.appendChild(line);
-                            countdown--;
-                        } else {
-                            clearInterval(countdownInterval);
-                            // Redirect to brand website
-                            window.location.href = "https://example.com"; // Replace with actual brand URL
-                        }
-                    }, 1000);
-                }
-            }
-            
-            printNextLine();
-        }
-        
-        // Move to specific stage
-        function moveToStage(stageNumber) {
-            // Hide current stage
-            document.querySelectorAll('.stage').forEach(stage => {
-                stage.classList.remove('active');
-            });
-            
-            // Show new stage
-            document.getElementById(`stage${stageNumber}`).classList.add('active');
-            currentStage = stageNumber;
-            
-            // Set up the new stage
-            switch(stageNumber) {
-                case 0:
-                    setupStage0();
-                    break;
-                case 1:
-                    setupStage1();
-                    break;
-                case 2:
-                    setupStage2();
-                    break;
-                case 3:
-                    setupStage3();
-                    break;
-                case 4:
-                    setupStage4();
-                    break;
-            }
-        }
-        
-        // Initialize the experience
-        document.addEventListener('DOMContentLoaded', function() {
-            setupStage0();
-            
-            // Show random errors occasionally throughout the experience
-            setInterval(() => {
-                if (Math.random() > 0.98) {
-                    showRandomError();
-                }
-            }, 15000);
-        });
-    </script>
+      }
+    }
+    requestAnimationFrame(updateGame);
+  }
+
+  function endGame() {
+    document.getElementById("phase4").classList.remove("active");
+    document.getElementById("phase5").classList.add("active");
+    setTimeout(()=>{ window.location.href="https://yourbrandsite.com"; },4000);
+  }
+
+  // ------------------ START ------------------
+  generateReceipt();
+</script>
 </body>
 </html>
