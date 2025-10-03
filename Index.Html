@@ -3,177 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Infinite Receipt | Premium Experience</title>
+    <title>System 7 Receipt Printer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ===== BASE STYLES ===== */
-        :root {
-            --primary: #00ffff;
-            --secondary: #ff00ff;
-            --accent: #ffff00;
-            --dark: #0a0a0a;
-            --darker: #050505;
-            --light: #ffffff;
-            --receipt-bg: #f8f8f8;
-            --glitch-red: #ff0000;
-            --glitch-blue: #0000ff;
-            --success: #00ff00;
-            --warning: #ffaa00;
-            --danger: #ff0000;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-        
-        html {
-            scroll-behavior: smooth;
+            font-family: 'Courier New', monospace;
         }
         
         body {
-            background-color: var(--dark);
-            color: var(--light);
-            font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-            overflow: hidden;
+            background: #0a0a0a;
+            color: #00ff00;
             min-height: 100vh;
-            position: relative;
-            cursor: none;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 255, 255, 0.05) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(255, 0, 255, 0.05) 0%, transparent 20%),
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(20, 20, 20, 0.3) 2px, rgba(20, 20, 20, 0.3) 4px);
-        }
-        
-        /* ===== CUSTOM CURSOR SYSTEM ===== */
-        .cursor {
-            position: fixed;
-            width: 20px;
-            height: 20px;
-            background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
-            border-radius: 50%;
-            z-index: 10000;
-            pointer-events: none;
-            mix-blend-mode: difference;
-            transition: transform 0.1s, width 0.3s, height 0.3s;
-        }
-        
-        .cursor.scanning {
-            width: 100px;
-            height: 5px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            border-radius: 0;
-            animation: scan 2s infinite;
-        }
-        
-        .cursor.clickable {
-            transform: scale(1.5);
-            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-        }
-        
-        .cursor.dragging {
-            transform: scale(0.8);
-            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
-        }
-        
-        @keyframes scan {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-        
-        /* ===== STAGE MANAGEMENT ===== */
-        .stage {
-            display: none;
-            min-height: 100vh;
-            padding: 40px 20px;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-        
-        .stage.active {
             display: flex;
-            opacity: 1;
-        }
-        
-        .stage.exit {
-            animation: stage-exit 1s forwards;
-        }
-        
-        @keyframes stage-exit {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-50px); }
-        }
-        
-        /* ===== EXIT PREVENTION SYSTEM ===== */
-        .exit-prevention {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(5, 5, 5, 0.98);
-            z-index: 1000;
-            display: none;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            text-align: center;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .exit-prevention.active {
-            display: flex;
-            animation: prevention-enter 0.5s forwards;
-        }
-        
-        @keyframes prevention-enter {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-        
-        .exit-prevention.exit {
-            animation: prevention-exit 0.5s forwards;
-        }
-        
-        @keyframes prevention-exit {
-            0% { opacity: 1; }
-            100% { opacity: 0; display: none; }
-        }
-        
-        /* ===== RECEIPT STYLING ===== */
-        .receipt {
-            background-color: var(--receipt-bg);
-            color: #000;
-            padding: 40px 30px;
-            position: relative;
+            justify-content: center;
             overflow: hidden;
-            margin: 20px auto;
+            position: relative;
+            transition: all 2s ease;
+        }
+        
+        body.stable {
+            background: #f0f0f0;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
             width: 100%;
             max-width: 500px;
-            box-shadow: 
-                0 0 50px rgba(0, 255, 255, 0.1),
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                inset 0 0 20px rgba(255, 255, 255, 0.1);
-            border: 1px solid #333;
-            transform: rotate(0.3deg);
-            transition: transform 0.3s, box-shadow 0.3s;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)),
-                repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0, 0, 0, 0.03) 1px, rgba(0, 0, 0, 0.03) 2px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            z-index: 10;
         }
         
-        .receipt:hover {
-            transform: rotate(0.5deg) translateY(-5px);
-            box-shadow: 
-                0 0 70px rgba(0, 255, 255, 0.2),
-                0 15px 40px rgba(0, 0, 0, 0.4),
-                inset 0 0 30px rgba(255, 255, 255, 0.15);
+        .stage {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 1s ease;
+        }
+        
+        .active {
+            display: flex;
+        }
+        
+        .receipt {
+            background: #fff;
+            color: #000;
+            width: 100%;
+            padding: 25px;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            border: 1px solid #333;
         }
         
         .receipt::before, .receipt::after {
@@ -199,2042 +88,1245 @@
             bottom: 0;
         }
         
-        .receipt-corner {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #000;
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #333;
+            padding-bottom: 10px;
         }
         
-        .receipt-corner.tl {
-            top: -1px;
-            left: -1px;
-            border-right: none;
-            border-bottom: none;
-        }
-        
-        .receipt-corner.tr {
-            top: -1px;
-            right: -1px;
-            border-left: none;
-            border-bottom: none;
-        }
-        
-        .receipt-corner.bl {
-            bottom: -1px;
-            left: -1px;
-            border-right: none;
-            border-top: none;
-        }
-        
-        .receipt-corner.br {
-            bottom: -1px;
-            right: -1px;
-            border-left: none;
-            border-top: none;
-        }
-        
-        /* ===== GLITCH EFFECTS SYSTEM ===== */
-        .glitch {
-            position: relative;
-        }
-        
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.8;
-        }
-        
-        .glitch::before {
-            left: 2px;
-            text-shadow: -1px 0 var(--glitch-red);
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-        
-        .glitch::after {
-            left: -2px;
-            text-shadow: 1px 0 var(--glitch-blue);
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim2 5s infinite linear alternate-reverse;
-        }
-        
-        @keyframes glitch-anim {
-            0% { clip: rect(42px, 9999px, 44px, 0); }
-            5% { clip: rect(12px, 9999px, 59px, 0); }
-            10% { clip: rect(48px, 9999px, 29px, 0); }
-            15% { clip: rect(42px, 9999px, 73px, 0); }
-            20% { clip: rect(63px, 9999px, 27px, 0); }
-            25% { clip: rect(34px, 9999px, 55px, 0); }
-            30% { clip: rect(86px, 9999px, 73px, 0); }
-            35% { clip: rect(20px, 9999px, 20px, 0); }
-            40% { clip: rect(26px, 9999px, 60px, 0); }
-            45% { clip: rect(25px, 9999px, 66px, 0); }
-            50% { clip: rect(57px, 9999px, 98px, 0); }
-            55% { clip: rect(5px, 9999px, 46px, 0); }
-            60% { clip: rect(82px, 9999px, 31px, 0); }
-            65% { clip: rect(54px, 9999px, 27px, 0); }
-            70% { clip: rect(28px, 9999px, 99px, 0); }
-            75% { clip: rect(45px, 9999px, 69px, 0); }
-            80% { clip: rect(23px, 9999px, 85px, 0); }
-            85% { clip: rect(54px, 9999px, 84px, 0); }
-            90% { clip: rect(45px, 9999px, 47px, 0); }
-            95% { clip: rect(37px, 9999px, 20px, 0); }
-            100% { clip: rect(4px, 9999px, 91px, 0); }
-        }
-        
-        @keyframes glitch-anim2 {
-            0% { clip: rect(65px, 9999px, 100px, 0); }
-            5% { clip: rect(52px, 9999px, 74px, 0); }
-            10% { clip: rect(79px, 9999px, 85px, 0); }
-            15% { clip: rect(75px, 9999px, 5px, 0); }
-            20% { clip: rect(67px, 9999px, 61px, 0); }
-            25% { clip: rect(14px, 9999px, 79px, 0); }
-            30% { clip: rect(1px, 9999px, 66px, 0); }
-            35% { clip: rect(86px, 9999px, 30px, 0); }
-            40% { clip: rect(23px, 9999px, 98px, 0); }
-            45% { clip: rect(85px, 9999px, 72px, 0); }
-            50% { clip: rect(71px, 9999px, 75px, 0); }
-            55% { clip: rect(2px, 9999px, 48px, 0); }
-            60% { clip: rect(30px, 9999px, 16px, 0); }
-            65% { clip: rect(59px, 9999px, 50px, 0); }
-            70% { clip: rect(41px, 9999px, 62px, 0); }
-            75% { clip: rect(2px, 9999px, 82px, 0); }
-            80% { clip: rect(47px, 9999px, 73px, 0); }
-            85% { clip: rect(3px, 9999px, 27px, 0); }
-            90% { clip: rect(26px, 9999px, 55px, 0); }
-            95% { clip: rect(42px, 9999px, 97px, 0); }
-            100% { clip: rect(38px, 9999px, 49px, 0); }
-        }
-        
-        .flicker {
-            animation: flicker 3s linear infinite;
-        }
-        
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-            51% { opacity: 0.8; }
-            52% { opacity: 0.3; }
-            53% { opacity: 0.9; }
-        }
-        
-        /* ===== BUTTON STYLES ===== */
-        button {
-            background-color: var(--dark);
-            color: var(--light);
-            border: 2px solid var(--light);
-            padding: 15px 30px;
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dotted #ccc;
             cursor: pointer;
-            margin: 10px 5px;
             transition: all 0.3s;
-            border-radius: 0;
-            min-height: 60px;
-            min-width: 200px;
-            position: relative;
-            overflow: hidden;
+        }
+        
+        .receipt-item:hover {
+            background-color: #f5f5f5;
+            padding-left: 10px;
+        }
+        
+        .receipt-item.crossed {
+            text-decoration: line-through;
+            color: #999;
+            background-color: #f9f9f9;
+        }
+        
+        .receipt-footer {
+            margin-top: 20px;
+            border-top: 2px dashed #333;
+            padding-top: 10px;
+            text-align: center;
+        }
+        
+        .btn {
+            background: #333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 12px 25px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        button:hover::before {
-            left: 100%;
-        }
-        
-        button:hover, button:focus {
-            background-color: var(--light);
-            color: var(--dark);
-            outline: 3px solid var(--primary);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-        }
-        
-        .primary-btn {
-            background-color: var(--primary);
-            color: var(--dark);
-            font-weight: bold;
-            border: 2px solid var(--primary);
-        }
-        
-        .primary-btn:hover, .primary-btn:focus {
-            background-color: var(--dark);
-            color: var(--primary);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.7);
-        }
-        
-        .danger-btn {
-            background-color: var(--danger);
-            color: var(--light);
-            border: 2px solid var(--danger);
-        }
-        
-        .danger-btn:hover, .danger-btn:focus {
-            background-color: var(--dark);
-            color: var(--danger);
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.7);
-        }
-        
-        /* ===== RECEIPT ITEMS ===== */
-        .receipt-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px dashed #ccc;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 18px;
-            min-height: 55px;
-            align-items: center;
-            position: relative;
-        }
-        
-        .receipt-item:hover, .receipt-item:focus {
-            background-color: #f0f0f0;
-            padding-left: 10px;
-            padding-right: 10px;
-            margin-left: -10px;
-            margin-right: -10px;
-        }
-        
-        .receipt-item.crossed-out {
-            text-decoration: line-through;
-            opacity: 0.5;
-            background-color: #f9f9f9;
-        }
-        
-        .receipt-item.crossed-out::after {
-            content: "❌";
-            position: absolute;
-            right: -25px;
-            color: var(--danger);
-            animation: crossed-pulse 1s infinite;
-        }
-        
-        @keyframes crossed-pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-        
-        .receipt-item.golden {
-            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+        .btn:hover {
+            background: #00ff00;
             color: #000;
-            font-weight: bold;
-            animation: golden-glow 2s infinite alternate;
-            border-bottom: 1px dashed #b8860b;
         }
         
-        @keyframes golden-glow {
-            0% { box-shadow: 0 0 5px gold; }
-            100% { box-shadow: 0 0 20px gold, 0 0 30px orange; }
-        }
-        
-        .receipt-item.rare {
-            background: linear-gradient(45deg, #e0e0e0, #ffffff, #e0e0e0);
-            color: #000;
-            font-weight: bold;
-            border-left: 3px solid var(--primary);
-            animation: rare-pulse 3s infinite;
-        }
-        
-        @keyframes rare-pulse {
-            0%, 100% { background: linear-gradient(45deg, #e0e0e0, #ffffff, #e0e0e0); }
-            50% { background: linear-gradient(45deg, #d0f0ff, #e6f7ff, #d0f0ff); }
-        }
-        
-        /* ===== MESSAGE POPUP ===== */
-        .message-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--darker);
-            color: var(--light);
-            padding: 30px;
-            border: 2px solid var(--primary);
-            z-index: 1000;
+        .message-box {
+            background: rgba(0, 255, 0, 0.1);
+            padding: 20px;
+            margin: 20px 0;
             text-align: center;
-            display: none;
-            max-width: 400px;
-            animation: pop-in 0.3s forwards;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
+            border: 1px solid #00ff00;
+            width: 100%;
         }
         
-        .message-popup.warning {
-            border-color: var(--warning);
-            box-shadow: 0 0 30px rgba(255, 170, 0, 0.3);
-        }
-        
-        .message-popup.danger {
-            border-color: var(--danger);
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
-        }
-        
-        @keyframes pop-in {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-        
-        /* ===== GAME ELEMENTS ===== */
         .game-container {
-            position: relative;
-            height: 500px;
             width: 100%;
-            max-width: 600px;
-            border: 2px solid var(--light);
-            margin: 20px auto;
+            height: 400px;
+            background: #111;
+            position: relative;
             overflow: hidden;
-            background: var(--darker);
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
-        }
-        
-        .falling-item {
-            position: absolute;
-            padding: 12px 18px;
-            border-radius: 3px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.1s;
-            text-align: center;
-            min-width: 140px;
-            z-index: 10;
-            font-weight: bold;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .falling-item.good {
-            background-color: var(--success);
-            color: #000;
-            border: 1px solid #0a0;
-            animation: good-float 2s infinite alternate;
-        }
-        
-        @keyframes good-float {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-5px); }
-        }
-        
-        .falling-item.bad {
-            background-color: var(--danger);
-            color: #fff;
-            border: 1px solid #a00;
-            animation: bad-shake 0.5s infinite;
-        }
-        
-        @keyframes bad-shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-2px); }
-            75% { transform: translateX(2px); }
-        }
-        
-        .falling-item.rare {
-            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
-            color: #000;
-            font-weight: bold;
-            animation: golden-glow 2s infinite alternate, rare-float 3s infinite alternate;
-            border: 1px solid #b8860b;
-        }
-        
-        @keyframes rare-float {
-            0% { transform: translateY(0) rotate(0deg); }
-            100% { transform: translateY(-10px) rotate(5deg); }
-        }
-        
-        .falling-item.caught {
-            animation: caught 0.5s forwards;
-        }
-        
-        @keyframes caught {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.7; }
-            100% { transform: scale(0); opacity: 0; }
+            margin: 20px 0;
+            border: 1px solid #00ff00;
         }
         
         .basket {
             position: absolute;
             bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 60px;
-            background: var(--primary);
-            border: 2px solid #000;
-            z-index: 20;
-            border-radius: 10px 10px 0 0;
-            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.3);
+            width: 100px;
+            height: 30px;
+            background: #00ff00;
+            transition: left 0.1s;
+        }
+        
+        .falling-item {
+            position: absolute;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
             transition: transform 0.1s;
         }
         
-        .basket.moving {
-            animation: basket-move 0.3s infinite alternate;
+        .falling-item.true-data {
+            background: #00ff00;
+            color: #000;
+            box-shadow: 0 0 10px #00ff00;
         }
         
-        @keyframes basket-move {
-            0% { transform: translateX(-50%) translateY(0); }
-            100% { transform: translateX(-50%) translateY(-5px); }
+        .falling-item.corrupted {
+            background: #ff0000;
+            color: #fff;
+            box-shadow: 0 0 10px #ff0000;
         }
         
-        .score {
+        .falling-item.rare {
+            background: gold;
+            color: #000;
+            box-shadow: 0 0 20px gold;
+            animation: pulse 1s infinite;
+        }
+        
+        .points-display {
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 8px 15px;
-            border-radius: 5px;
-            z-index: 30;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
             font-size: 18px;
-            border: 1px solid var(--primary);
-        }
-        
-        .progress-container {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            width: 200px;
-            height: 20px;
-            background: #333;
-            border: 1px solid var(--primary);
-            z-index: 30;
-            border-radius: 10px;
-            overflow: hidden;
+            border: 1px solid #00ff00;
         }
         
         .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: width 0.3s ease;
-            border-radius: 10px;
-        }
-        
-        /* ===== TEXT STYLES ===== */
-        h1 {
-            font-size: 42px;
-            margin-bottom: 30px;
-            text-align: center;
-            line-height: 1.2;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-            position: relative;
-        }
-        
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-        }
-        
-        h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-        
-        p {
-            font-size: 18px;
-            margin-bottom: 20px;
-            max-width: 600px;
-            line-height: 1.5;
-        }
-        
-        .instruction {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 5px;
+            width: 100%;
+            height: 20px;
+            background: #111;
             margin: 20px 0;
-            max-width: 500px;
-            border-left: 3px solid var(--primary);
-            position: relative;
-        }
-        
-        .instruction::before {
-            content: '💡';
-            position: absolute;
-            left: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 24px;
-        }
-        
-        /* ===== INFINITE RECEIPT SCROLL ===== */
-        .infinite-receipt {
-            height: 500px;
-            width: 100%;
-            max-width: 500px;
             overflow: hidden;
-            position: relative;
-            margin: 20px auto;
-            border: 2px solid var(--light);
-            background: var(--receipt-bg);
-            color: #000;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+            border: 1px solid #00ff00;
         }
         
-        .receipt-content {
-            position: absolute;
-            top: 100%;
-            width: 100%;
-            padding: 20px;
-            animation: scroll-up 120s linear forwards;
-        }
-        
-        @keyframes scroll-up {
-            0% { top: 100%; }
-            100% { top: -5000px; }
-        }
-        
-        /* ===== GLITCH OVERLAY ===== */
-        .glitch-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+        .progress {
             height: 100%;
-            background: 
-                linear-gradient(rgba(255,0,0,0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,0,0,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            pointer-events: none;
-            opacity: 0;
-            z-index: 999;
-            animation: static 0.2s infinite;
+            background: #00ff00;
+            width: 0%;
+            transition: width 0.5s;
         }
         
-        @keyframes static {
-            0% { background-position: 0 0; }
-            100% { background-position: 20px 20px; }
+        .glitch {
+            animation: glitch 1s infinite;
         }
         
-        /* ===== PRINTER ANIMATION ===== */
-        .printer-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--darker);
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .printer-animation.active {
-            display: flex;
-            animation: printer-enter 0.5s forwards;
-        }
-        
-        @keyframes printer-enter {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-        
-        .printer-output {
-            width: 100%;
-            max-width: 500px;
-            background: var(--receipt-bg);
-            color: #000;
-            padding: 40px 30px;
-            position: relative;
+        .typewriter {
             overflow: hidden;
-            font-family: 'Courier New', monospace;
-            border: 1px solid #333;
-            box-shadow: 0 0 50px rgba(0, 255, 255, 0.2);
-            transform: translateY(100%);
-            animation: printer-output-enter 1s forwards 0.5s;
+            border-right: 2px solid #00ff00;
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
         }
         
-        @keyframes printer-output-enter {
-            0% { transform: translateY(100%); }
-            100% { transform: translateY(0); }
+        .access-denied {
+            color: #ff0000;
+            animation: shake 0.5s;
+            text-transform: uppercase;
         }
         
-        .printer-line {
-            opacity: 0;
-            animation: print-line 0.5s forwards;
-            margin-bottom: 5px;
+        .success {
+            color: #00ff00;
+            animation: pulse 1s;
         }
         
-        @keyframes print-line {
-            0% { opacity: 0; transform: translateY(-10px); }
-            100% { opacity: 1; transform: translateY(0); }
+        .location {
+            color: #ffff00;
         }
         
-        /* ===== AUDIO VISUALIZER ===== */
-        .audio-visualizer {
+        .ice-overlay {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            z-index: 500;
-            opacity: 0.3;
+            height: 0%;
+            background: linear-gradient(to top, rgba(173, 216, 230, 0.8), rgba(240, 248, 255, 0.9));
+            z-index: 5;
+            transition: height 5s linear;
             pointer-events: none;
         }
         
-        .visualizer-bar {
-            width: 5px;
-            margin: 0 2px;
-            background: var(--primary);
-            border-radius: 2px 2px 0 0;
-            transition: height 0.1s;
+        .ice-overlay.active {
+            height: 100%;
         }
         
-        /* ===== SECRET EASTER EGGS ===== */
-        .easter-egg {
+        .ice-crack {
             position: fixed;
-            z-index: 800;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M10,10 L90,90 M30,10 L70,90 M50,10 L50,90 M10,30 L90,70 M10,50 L90,50" stroke="white" stroke-width="2" fill="none" /></svg>');
             opacity: 0;
-            transition: opacity 0.5s;
+            z-index: 6;
             pointer-events: none;
         }
         
-        .easter-egg.active {
-            opacity: 1;
-            pointer-events: all;
+        .ice-crack.active {
+            animation: crack 0.5s forwards;
         }
         
-        .konami-activated {
-            animation: konami-celebration 5s forwards;
+        .questionnaire {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border: 2px solid #00aaff;
+            border-radius: 10px;
+            margin: 20px 0;
+            z-index: 10;
         }
         
-        @keyframes konami-celebration {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
+        .question {
+            margin: 15px 0;
+            text-align: center;
         }
         
-        /* ===== RESPONSIVE ADJUSTMENTS ===== */
+        .timer {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #ff9900;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #00ff00; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes print {
+            to { opacity: 1; }
+        }
+        
+        @keyframes crack {
+            0% { opacity: 0; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+            100% { opacity: 0; transform: scale(1.2); }
+        }
+        
+        .print-line {
+            opacity: 0;
+            animation: print 0.5s forwards;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .emoji {
+            font-size: 20px;
+            margin: 0 5px;
+        }
+        
+        .static {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15) 0px,
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.1;
+        }
+        
+        .static.active {
+            opacity: 0.3;
+            animation: staticMove 0.1s infinite;
+        }
+        
+        @keyframes staticMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 10px; }
+        }
+        
         @media (max-width: 600px) {
-            h1 {
-                font-size: 32px;
+            .container {
+                padding: 10px;
             }
             
-            h2 {
-                font-size: 24px;
-            }
-            
-            p {
-                font-size: 16px;
-            }
-            
-            button {
-                padding: 12px 20px;
-                font-size: 16px;
-                min-height: 50px;
-                min-width: 160px;
-            }
-            
-            .receipt-item {
-                font-size: 16px;
-                min-height: 50px;
+            .receipt {
+                padding: 15px;
             }
             
             .game-container {
-                height: 400px;
-            }
-            
-            .infinite-receipt {
-                height: 400px;
-            }
-        }
-        
-        /* ===== REDUCED MOTION SUPPORT ===== */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
+                height: 300px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Custom cursor -->
-    <div class="cursor"></div>
+    <div class="static" id="staticOverlay"></div>
+    <div class="ice-overlay" id="iceOverlay"></div>
+    <div class="ice-crack" id="iceCrack"></div>
     
-    <!-- Glitch overlay -->
-    <div class="glitch-overlay" id="glitchOverlay"></div>
-    
-    <!-- Audio visualizer -->
-    <div class="audio-visualizer" id="audioVisualizer">
-        <!-- Bars will be generated by JavaScript -->
-    </div>
-    
-    <!-- Exit prevention overlay -->
-    <div class="exit-prevention" id="exitPrevention">
-        <div class="receipt">
-            <div class="receipt-corner tl"></div>
-            <div class="receipt-corner tr"></div>
-            <div class="receipt-corner bl"></div>
-            <div class="receipt-corner br"></div>
-            
-            <h2>TRANSACTION IN PROGRESS</h2>
-            <p>================================</p>
-            <p>You cannot leave the counter without your change.</p>
-            <p>Please complete the checkout process.</p>
-            <p>================================</p>
-            <button class="primary-btn" id="continueTransaction">CONTINUE TRANSACTION</button>
-            <button class="danger-btn" id="forceExit">FORCE EXIT (NOT RECOMMENDED)</button>
-        </div>
-    </div>
-    
-    <!-- Message popup -->
-    <div class="message-popup" id="messagePopup">
-        <p id="popupMessage"></p>
-        <button class="primary-btn" id="closePopup">CONTINUE</button>
-    </div>
-    
-    <!-- Easter Eggs -->
-    <div class="easter-egg" id="secretShop">
-        <div class="receipt">
-            <h2>SECRET SHOP UNLOCKED</h2>
-            <p>================================</p>
-            <p>You found the hidden shop!</p>
-            <p>Special items available:</p>
-            <div class="receipt-item golden">
-                <span>Infinite Patience</span>
-                <span>FREE</span>
+    <div class="container">
+        <!-- Stage 1: The Personal Invitation -->
+        <div id="stage1" class="stage active">
+            <h1>System 7 Receipt Printer</h1>
+            <div class="message-box">
+                <p id="welcomeMessage" class="typewriter">Searching... Entity detected. This is a System 7 Receipt Printer. You've made a purchase, and we have the record. Let's print it for you.</p>
             </div>
-            <div class="receipt-item rare">
-                <span>Developer's Appreciation</span>
-                <span>FREE</span>
-            </div>
-            <p>================================</p>
-            <button class="primary-btn" id="closeSecretShop">CLOSE SHOP</button>
-        </div>
-    </div>
-    
-    <!-- Stage 0: Receipt Item Crossing -->
-    <div id="stage0" class="stage active">
-        <h1 class="glitch flicker" data-text="THE INFINITE RECEIPT">THE INFINITE RECEIPT</h1>
-        
-        <div class="receipt" id="crossingReceipt">
-            <div class="receipt-corner tl"></div>
-            <div class="receipt-corner tr"></div>
-            <div class="receipt-corner bl"></div>
-            <div class="receipt-corner br"></div>
-            
-            <h2>NOT THE BEST™ STORE</h2>
-            <p>================================</p>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Shoelace of Enlightenment</span>
-                <span>₹2,499</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Digital Oxygen</span>
-                <span>₹499</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Cloud Storage for Dreams</span>
-                <span>₹1,299</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Broken Socks</span>
-                <span>₹4,999</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Existential Crisis</span>
-                <span>PRICELESS</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>WiFi Signal Booster</span>
-                <span>₹799</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Invisible Ink Cartridge</span>
-                <span>₹2,499</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Time Travel Surcharge</span>
-                <span>₹9,999</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Digital Footprint Cleaner</span>
-                <span>₹3,999</span>
-            </div>
-            
-            <div class="receipt-item" tabindex="0" role="button">
-                <span>Privacy Tax</span>
-                <span>₹1,200</span>
-            </div>
-            
-            <div class="receipt-item rare" tabindex="0" role="button">
-                <span>Secret Menu Access</span>
-                <span>₹0.01</span>
-            </div>
-            
-            <p>================================</p>
-            <p>Subtotal: You Regret This</p>
-            <p>Tax: Pain (18%)</p>
-            <p>Handling Fee: 21.01%</p>
-            <p>Cashier: Nobody</p>
-            <p>================================</p>
-            <p class="glitch" data-text="TOTAL: Your Soul">TOTAL: Your Soul</p>
-            <p>Tip: Don't.</p>
-            <p>================================</p>
-        </div>
-        
-        <p class="instruction">Click items to cross them out and reveal hidden messages. Find the rare item for a special surprise!</p>
-        <p id="selectionMessage">Items crossed: <span id="crossedCount">0</span>/11</p>
-    </div>
-    
-    <!-- Stage 1: Glitch Uncover -->
-    <div id="stage1" class="stage">
-        <h1 class="flicker">SYSTEM OVERRIDE DETECTED</h1>
-        
-        <div class="receipt glitch">
-            <div class="receipt-corner tl"></div>
-            <div class="receipt-corner tr"></div>
-            <div class="receipt-corner bl"></div>
-            <div class="receipt-corner br"></div>
-            
-            <h2>CRITICAL SYSTEM ERROR</h2>
-            <p>================================</p>
-            <p>Receipt integrity compromised</p>
-            <p>Glitch pattern detected</p>
-            <p>System override required</p>
-            <p>================================</p>
-            <p>FIX THE GLITCH TO CONTINUE</p>
-            <p>================================</p>
-        </div>
-        
-        <button class="primary-btn" id="fixGlitchBtn">INITIATE SYSTEM REPAIR</button>
-        
-        <div class="instruction">
-            <p>Warning: System instability detected. Prepare for unexpected behavior.</p>
-        </div>
-    </div>
-    
-    <!-- Stage 2: Infinite Receipt Scroll -->
-    <div id="stage2" class="stage">
-        <h1>RECEIPT OVERFLOW DETECTED</h1>
-        
-        <div class="infinite-receipt">
-            <div class="receipt-content" id="infiniteReceiptContent">
-                <!-- Content will be generated by JavaScript -->
+            <div id="printerAnimation" style="display: none;">
+                <div class="receipt">
+                    <div class="receipt-header">
+                        <h2>SYSTEM 7 RECEIPT</h2>
+                        <p>Initializing print sequence...</p>
+                    </div>
+                    <div id="printingLines">
+                        <!-- Printing lines will be added here -->
+                    </div>
+                </div>
             </div>
         </div>
         
-        <p class="instruction">Stabilizing receipt stream... Please wait. Look for golden items!</p>
-        
-        <div class="progress-container">
-            <div class="progress-bar" id="scrollProgress"></div>
-        </div>
-        <p>Scroll Progress: <span id="scrollPercent">0</span>%</p>
-    </div>
-    
-    <!-- Stage 3: Mini Game -->
-    <div id="stage3" class="stage">
-        <h1>SYSTEM STABILIZATION REQUIRED</h1>
-        
-        <div class="game-container" id="gameContainer">
-            <div class="basket" id="basket"></div>
-            <div class="score">Caught: <span id="score">0</span>/20</div>
-            <div class="progress-container">
-                <div class="progress-bar" id="gameProgress"></div>
+        <!-- Stage 2: The Phantom Purchase Riddle -->
+        <div id="stage2" class="stage">
+            <h1>System Integrity Check</h1>
+            <div class="message-box">
+                <p>Our records show conflicting data. De-authorize TWO phantom charges to prove you are the rightful owner.</p>
             </div>
-            <!-- Falling items will be generated here -->
-        </div>
-        
-        <p class="instruction">Use LEFT/RIGHT arrows or mouse to move the basket. Catch falling receipt items to stabilize the system. Avoid red items!</p>
-        
-        <div class="game-stats">
-            <p>Time: <span id="gameTime">60</span>s | Combo: <span id="combo">0</span>x</p>
-        </div>
-    </div>
-    
-    <!-- Stage 4: Final Print & Redirect -->
-    <div id="stage4" class="stage">
-        <div class="printer-animation" id="printerAnimation">
-            <div class="printer-output" id="printerOutput">
-                <!-- Content will be generated by JavaScript -->
+            <div class="receipt">
+                <div class="receipt-header">
+                    <h2>TRANSACTION RECORD</h2>
+                    <p>Account Verification Required</p>
+                </div>
+                
+                <div class="receipt-item" data-id="1">
+                    <span>Digital Soul Insurance</span>
+                    <span>₹9,999</span>
+                </div>
+                
+                <div class="receipt-item" data-id="2">
+                    <span>1 Dozen Eggs</span>
+                    <span>₹120</span>
+                </div>
+                
+                <div class="receipt-item" data-id="3">
+                    <span>A Sense of Impending Doom</span>
+                    <span>₹4,999</span>
+                </div>
+                
+                <div class="receipt-item" data-id="4">
+                    <span>Subscription to Reality Prime</span>
+                    <span>₹299/month</span>
+                </div>
+                
+                <div class="receipt-footer">
+                    <p>Select the TWO phantom charges to de-authorize</p>
+                    <p>Selected: <span id="selectedCount">0</span>/2</p>
+                </div>
             </div>
+            <button class="btn" id="verifyBtn" disabled>Verify Selection</button>
+            <div id="accessDenied" class="message-box access-denied" style="display: none;">
+                <p>[ACCESS_DENIED :: ENTITY_UNKNOWN]</p>
+            </div>
+        </div>
+        
+        <!-- Stage 3: The Corrupted & Predictive Print Job -->
+        <div id="stage3" class="stage">
+            <h1>Printing Transaction Record</h1>
+            <div class="receipt">
+                <div id="corruptedPrintContent">
+                    <!-- Printing content will be added here -->
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="printProgress"></div>
+            </div>
+            <p id="printStatus">Initializing printer...</p>
+            <div id="corruptionMessage" class="message-box" style="display: none;">
+                <p>[...memory corruption detected, <span id="clickToRestore" style="text-decoration: underline; cursor: pointer;">accessing predictive datastream...</span>...]</p>
+            </div>
+            <div id="reassuranceMessage" class="message-box" style="display: none;">
+                <p>Apologies. We accessed the wrong timeline. Now accessing your predictive purchase history. The thing you're thinking of buying next week... or perhaps in December 2025. It's all the same to us.</p>
+            </div>
+        </div>
+        
+        <!-- Stage 4: The Glitch and The Choice -->
+        <div id="stage4" class="stage">
+            <h1 class="glitch">KERNEL PANIC</h1>
+            <div class="message-box glitch">
+                <h2>Print buffer overflow</h2>
+                <p>The system is glitched.</p>
+            </div>
+            <button class="btn" id="tryAgainBtn">Try Again</button>
+            <button class="btn" id="fixGlitchBtn">Attempt to Fix the Glitch</button>
+        </div>
+        
+        <!-- Stage 5: The Data Recovery Mini-Game -->
+        <div id="stage5" class="stage">
+            <h1>System Repair Initiated</h1>
+            <div class="message-box">
+                <p>Catch the TRUE data fragments. Avoid corrupted files.</p>
+                <p>Time: <span id="gameTime">30</span>s</p>
+            </div>
+            
+            <div class="game-container" id="gameContainer">
+                <div class="basket" id="basket"></div>
+                <div class="points-display">Points: <span id="points">0</span></div>
+                <!-- Falling items will be added here -->
+            </div>
+        </div>
+        
+        <!-- Stage 6: The "Frozen in Time" Questionnaire -->
+        <div id="stage6" class="stage">
+            <h1>SYSTEM COLD-STORAGE ACCESSED</h1>
+            <div class="message-box">
+                <p>CONFIRM A FUTURE INTENT TO UNLOCK LOYALTY BONUS</p>
+                <p class="timer" id="questionTimer">20</p>
+            </div>
+            
+            <div class="questionnaire" id="questionnaire">
+                <!-- Questions will be added here -->
+            </div>
+        </div>
+        
+        <!-- Stage 7: The Reward Calculation -->
+        <div id="stage7" class="stage">
+            <h1>CALCULATING FINAL REWARD</h1>
+            <div class="receipt">
+                <div class="receipt-header">
+                    <h2>LOYALTY REWARD CALCULATION</h2>
+                </div>
+                
+                <div class="receipt-item">
+                    <span>Data Fragments Recovered</span>
+                    <span>+<span id="finalScore">0</span> points</span>
+                </div>
+                
+                <div class="receipt-item" id="futureIntentItem" style="display: none;">
+                    <span>Future Intent Confirmed</span>
+                    <span>30% LOYALTY BONUS UNLOCKED</span>
+                </div>
+                
+                <div class="receipt-item" id="standardRebateItem" style="display: none;">
+                    <span>Future Intent Unconfirmed</span>
+                    <span>Standard 0.1% Rebate Applied</span>
+                </div>
+                
+                <div class="receipt-footer">
+                    <p id="rewardMessage">Calculating your final reward...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stage 8: The Final System Sync & Redirect -->
+        <div id="stage8" class="stage">
+            <h1>SYSTEM SYNC</h1>
+            <div class="message-box">
+                <p id="syncMessage">Syncing your data... thank you for your assistance.</p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress" id="syncProgress"></div>
+            </div>
+            
+            <div id="finalMessages">
+                <!-- Messages will be added here -->
+            </div>
+            
+            <p>Redirecting in <span id="countdown">5</span> seconds...</p>
         </div>
     </div>
 
+    <audio id="fanSound" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-computer-fan-noise-1381.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="printSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-printer-scan-2772.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="buzzerSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="successSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="glitchSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-digital-glitch-2296.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="chimeSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-sound-3095.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="iceSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-ice-cracking-1254.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="shatterSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-glass-break-with-huge-splatter-2580.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
-        // ===== PREMIUM FEATURES CONFIGURATION =====
-        const CONFIG = {
-            debugMode: false,
-            enableAudio: true,
-            enableEasterEggs: true,
-            enableVisualizer: true,
-            enableParticles: true,
-            totalStages: 5,
-            requiredClicks: 11,
-            gameTargetScore: 20,
-            gameTimeLimit: 60,
-            scrollDuration: 120, // seconds
-            glitchIntensity: 0.7,
-            easterEggChance: 0.05
-        };
-        
-        // ===== STATE MANAGEMENT =====
-        let currentStage = 0;
-        let crossedItems = 0;
-        let gameScore = 0;
-        let gameTime = CONFIG.gameTimeLimit;
-        let gameCombo = 0;
-        let gameItems = [];
+        // Stage management
+        let currentStage = 1;
+        let selectedItems = [];
+        let points = 0;
         let gameInterval;
-        let scrollInterval;
-        let usedMessages = new Set();
-        let konamiCode = [];
-        let audioContext;
-        let analyser;
-        let audioData;
-        let particles = [];
-        let easterEggsFound = 0;
+        let gameTime = 30;
+        let redirectInterval;
+        let tryAgainCount = 0;
+        let userLocation = "Chennai"; // In a real implementation, this would be detected
+        let futureIntentConfirmed = false;
+        let questionnaireTimer;
+        let questionTimeLeft = 20;
         
-        // ===== PREMIUM MESSAGE BANKS =====
-        const wittyMessages = [
-            "You received: 2kg of nostalgia.",
-            "Discount applied: Eternal confusion (-₹99).",
-            "Item unavailable: Love. Please restock later.",
-            "You unlocked: Grandma's secret approval coupon.",
-            "System Tax: +18% stress.",
-            "Bonus: Unused gift card (expired).",
-            "You found: A free trial of disappointment.",
-            "Reward: One slightly used compliment.",
-            "Acquired: The ability to parallel park perfectly.",
-            "Unlocked: Secret handshake with destiny.",
-            "Received: Backstage pass to your own dreams.",
-            "Found: Map to buried potential.",
-            "Awarded: Gold medal in procrastination.",
-            "Discovered: Lost remote from 2015.",
-            "Earned: PhD in overthinking.",
-            "Collected: All seven deadly WiFi signals.",
-            "Unlocked: Premium version of your personality.",
-            "Received: Time machine (batteries not included).",
-            "Found: Missing sock from laundry dimension.",
-            "Acquired: Superpower of finding parking spots.",
-            "Awarded: Certificate of adequate existence.",
-            "Discovered: Fountain of mildly interesting facts.",
-            "Unlocked: Ability to understand cats.",
-            "Received: Map of all potholes in your city.",
-            "Found: Key to happiness (misplaced immediately).",
-            "Earned: Black belt in avoiding eye contact.",
-            "Collected: Complete set of awkward moments.",
-            "Unlocked: Secret menu of life options.",
-            "Received: VIP pass to the back of the line.",
-            "Found: Instruction manual for your brain.",
-            "Acquired: Talent for burning toast perfectly.",
-            "Awarded: Medal in competitive napping.",
-            "Discovered: Lost city of found potential.",
-            "Unlocked: Ability to parallel universe hop.",
-            "Received: Coupon for one free mistake.",
-            "Found: Missing piece of life's puzzle.",
-            "Earned: Degree in advanced Netflix navigation.",
-            "Collected: All infinity stones of procrastination.",
-            "Unlocked: Premium ad-free version of reality.",
-            "Received: Map to all the best food trucks.",
-            "Found: Secret recipe for instant happiness.",
-            "Acquired: Superpower of always finding charging ports.",
-            "Awarded: Trophy for most creative excuses.",
-            "Discovered: Fountain of eternal mild satisfaction.",
-            "Unlocked: Ability to speak fluent sarcasm.",
-            "Received: Golden ticket to nowhere special.",
-            "Found: Missing motivation (slightly used).",
-            "Earned: PhD in avoiding responsibilities.",
-            "Collected: Complete set of life's cheat codes.",
-            "Unlocked: Premium subscription to existence.",
-            "Received: Map to all hidden gem restaurants.",
-            "Found: Key to unlimited potential (temporarily).",
-            "Acquired: Talent for perfect avocado selection.",
-            "Awarded: Medal in Olympic-level lounging.",
-            "Discovered: Lost art of conversation.",
-            "Unlocked: Ability to time travel 5 minutes back.",
-            "Received: Coupon for one free life do-over.",
-            "Found: Missing enthusiasm (lightly worn).",
-            "Earned: Degree in advanced social awkwardness.",
-            "Collected: All pieces of broken resolutions.",
-            "Unlocked: Premium filter for reality.",
-            "Received: VIP access to ordinary moments.",
-            "Found: Secret to eternal patience (expired).",
-            "Acquired: Superpower of finding lost TV remotes.",
-            "Awarded: Trophy for most creative life hacks.",
-            "Discovered: Fountain of mildly interesting ideas.",
-            "Unlocked: Ability to speak all languages poorly.",
-            "Received: Golden key to average experiences.",
-            "Found: Missing ambition (slightly damaged).",
-            "Earned: PhD in advanced procrastination techniques.",
-            "Collected: Complete set of life's plot twists.",
-            "Unlocked: Premium upgrade for your personality.",
-            "Received: Map to all the best viewpoints.",
-            "Found: Secret recipe for instant motivation.",
-            "Acquired: Talent for perfect parking spot timing.",
-            "Awarded: Medal in competitive relaxation.",
-            "Discovered: Lost civilization of productive people.",
-            "Unlocked: Ability to read minds (your own only).",
-            "Received: Coupon for one free brilliant idea.",
-            "Found: Missing creativity (temporarily borrowed).",
-            "Earned: Degree in advanced life navigation.",
-            "Collected: All pieces of shattered expectations.",
-            "Unlocked: Premium features for daily life.",
-            "Received: VIP pass to life's blooper reel.",
-            "Found: Key to unlimited coffee refills.",
-            "Acquired: Superpower of perfect pizza ordering.",
-            "Awarded: Trophy for most dramatic life moments.",
-            "Discovered: Fountain of eternal mild amusement.",
-            "Unlocked: Ability to predict obvious outcomes.",
-            "Received: Golden ticket to mediocre adventures.",
-            "Found: Missing sense of direction (partially).",
-            "Earned: PhD in avoiding awkward situations.",
-            "Collected: Complete set of life's ironies.",
-            "Unlocked: Premium soundtrack for your life.",
-            "Received: Map to all hidden shortcuts.",
-            "Found: Secret to perfect timing (usually wrong).",
-            "Acquired: Talent for finding four-leaf clovers.",
-            "Awarded: Medal in expert-level people watching.",
-            "Discovered: Lost art of small talk.",
-            "Unlocked: Ability to understand bureaucracy.",
-            "Received: Coupon for one free moment of clarity.",
-            "Found: Missing patience (low battery).",
-            "Earned: Degree in advanced life hacking.",
-            "Collected: All pieces of broken promises.",
-            "Unlocked: Premium lighting for your life.",
-            "Received: VIP access to ordinary miracles.",
-            "Found: Key to unlimited potential (requires charging)."
+        // Correct phantom charges (items to cancel)
+        const correctItems = [1, 3]; // Digital Soul Insurance and A Sense of Impending Doom
+        
+        // Items for the mini-game
+        const gameItems = [
+            { text: "Productivity Chip", emoji: "💾", type: "true" },
+            { text: "Focus Bean", emoji: "🔮", type: "true" },
+            { text: "Memory Boost", emoji: "🧠", type: "true" },
+            { text: "Clarity Module", emoji: "💎", type: "true" },
+            { text: "Existential Dread", emoji: "😱", type: "corrupted" },
+            { text: "Lag Spike", emoji: "⚡", type: "corrupted" },
+            { text: "Data Corruption", emoji: "💥", type: "corrupted" },
+            { text: "System Error", emoji: "❌", type: "corrupted" },
+            { text: "TRUE_SELF_FRAGMENT", emoji: "⭐", type: "rare" }
         ];
         
-        const rareItems = [
-            "Legendary Item Dropped: Half-eaten samosa",
-            "ULTRA RARE: Grandma's secret recipe",
-            "MYTHIC: One perfectly ripe avocado",
-            "LEGENDARY: The remote that never gets lost",
-            "ULTRA RARE: WiFi password that actually works",
-            "MYTHIC: Parking spot right by the entrance",
-            "LEGENDARY: Phone charger that fits perfectly",
-            "ULTRA RARE: Morning without hitting snooze",
-            "MYTHIC: Complete set of matching socks",
-            "LEGENDARY: Hot beverage at perfect temperature"
+        // Questions for the questionnaire
+        const questions = [
+            "Confirming future purchase: A ticket to Mars?",
+            "Confirming future purchase: Lifetime supply of coffee?",
+            "Confirming future purchase: The ability to speak to animals?",
+            "Confirming future purchase: Time travel device?",
+            "Confirming future purchase: Invisibility cloak?"
         ];
         
-        const errorMessages = [
-            "Are you still there, customer?",
-            "Receipt overheating. Cool down recommended.",
-            "Restart required. Just kidding.",
-            "System calibrating. Please hold your breath.",
-            "Processing... Processing... Still processing...",
-            "Cashier.exe has stopped working",
-            "Memory leak detected in receipt printer",
-            "Please wait while we find the manager",
-            "Unexpected item in bagging area",
-            "Card declined. Try again with your soul.",
-            "Insufficient funds in your karma account",
-            "Please swipe card again. Slower this time.",
-            "Network connection to reality lost",
-            "Receipt paper jammed with existential dread",
-            "Please wait for the next available cashier",
-            "Price check needed for your self-worth",
-            "Barcode unreadable. Try wiping off the tears.",
-            "Payment processing... Please be patient",
-            "System updating to version 2.0 of your life",
-            "Receipt printer out of ink. Using blood instead."
-        ];
+        // DOM elements
+        const welcomeMessage = document.getElementById('welcomeMessage');
+        const printerAnimation = document.getElementById('printerAnimation');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const tryAgainBtn = document.getElementById('tryAgainBtn');
+        const fixGlitchBtn = document.getElementById('fixGlitchBtn');
+        const selectedCount = document.getElementById('selectedCount');
+        const accessDenied = document.getElementById('accessDenied');
+        const pointsDisplay = document.getElementById('points');
+        const gameTimeDisplay = document.getElementById('gameTime');
+        const countdownDisplay = document.getElementById('countdown');
+        const printProgress = document.getElementById('printProgress');
+        const syncProgress = document.getElementById('syncProgress');
+        const printStatus = document.getElementById('printStatus');
+        const corruptedPrintContent = document.getElementById('corruptedPrintContent');
+        const corruptionMessage = document.getElementById('corruptionMessage');
+        const clickToRestore = document.getElementById('clickToRestore');
+        const reassuranceMessage = document.getElementById('reassuranceMessage');
+        const basket = document.getElementById('basket');
+        const gameContainer = document.getElementById('gameContainer');
+        const staticOverlay = document.getElementById('staticOverlay');
+        const iceOverlay = document.getElementById('iceOverlay');
+        const iceCrack = document.getElementById('iceCrack');
+        const questionnaire = document.getElementById('questionnaire');
+        const questionTimer = document.getElementById('questionTimer');
+        const finalScore = document.getElementById('finalScore');
+        const futureIntentItem = document.getElementById('futureIntentItem');
+        const standardRebateItem = document.getElementById('standardRebateItem');
+        const rewardMessage = document.getElementById('rewardMessage');
+        const syncMessage = document.getElementById('syncMessage');
+        const finalMessages = document.getElementById('finalMessages');
         
-        // ===== PREMIUM INITIALIZATION =====
-        document.addEventListener('DOMContentLoaded', function() {
-            initializePremiumFeatures();
-            setupStage0();
-            
-            // Show random errors occasionally throughout the experience
-            setInterval(() => {
-                if (Math.random() > 0.98) {
-                    showRandomError();
-                }
-            }, 15000);
-        });
+        // Audio elements
+        const fanSound = document.getElementById('fanSound');
+        const printSound = document.getElementById('printSound');
+        const buzzerSound = document.getElementById('buzzerSound');
+        const successSound = document.getElementById('successSound');
+        const glitchSound = document.getElementById('glitchSound');
+        const chimeSound = document.getElementById('chimeSound');
+        const iceSound = document.getElementById('iceSound');
+        const shatterSound = document.getElementById('shatterSound');
         
-        function initializePremiumFeatures() {
-            // Initialize custom cursor
-            setupCustomCursor();
+        // Initialize the experience
+        function init() {
+            // Start with fan sound
+            fanSound.volume = 0.3;
+            fanSound.play();
             
-            // Initialize audio visualizer if enabled
-            if (CONFIG.enableVisualizer) {
-                setupAudioVisualizer();
-            }
+            // Event listeners
+            verifyBtn.addEventListener('click', verifySelection);
+            tryAgainBtn.addEventListener('click', tryAgain);
+            fixGlitchBtn.addEventListener('click', fixGlitch);
+            clickToRestore.addEventListener('click', restorePrinting);
             
-            // Initialize particle system if enabled
-            if (CONFIG.enableParticles) {
-                setupParticleSystem();
-            }
-            
-            // Initialize Konami code detection
-            setupKonamiCode();
-            
-            console.log("Premium Infinite Receipt initialized with features:", CONFIG);
-        }
-        
-        // ===== CUSTOM CURSOR SYSTEM =====
-        function setupCustomCursor() {
-            const cursor = document.querySelector('.cursor');
-            
-            document.addEventListener('mousemove', function(e) {
-                cursor.style.left = e.pageX + 'px';
-                cursor.style.top = e.pageY + 'px';
+            // Add click events to receipt items
+            document.querySelectorAll('.receipt-item').forEach(item => {
+                item.addEventListener('click', toggleItemSelection);
             });
-            
-            // Change cursor on interactive elements
-            document.addEventListener('mouseover', function(e) {
-                if (e.target.matches('button, .receipt-item, .falling-item')) {
-                    cursor.classList.add('clickable');
-                }
-            });
-            
-            document.addEventListener('mouseout', function(e) {
-                if (e.target.matches('button, .receipt-item, .falling-item')) {
-                    cursor.classList.remove('clickable');
-                }
-            });
-            
-            // Scanning effect occasionally
-            setInterval(() => {
-                if (Math.random() > 0.7) {
-                    cursor.classList.add('scanning');
-                    setTimeout(() => {
-                        cursor.classList.remove('scanning');
-                    }, 2000);
-                }
-            }, 10000);
-        }
-        
-        // ===== AUDIO VISUALIZER SYSTEM =====
-        function setupAudioVisualizer() {
-            const visualizer = document.getElementById('audioVisualizer');
-            
-            // Create visualizer bars
-            for (let i = 0; i < 50; i++) {
-                const bar = document.createElement('div');
-                bar.className = 'visualizer-bar';
-                bar.style.height = '10px';
-                visualizer.appendChild(bar);
-            }
-            
-            // Simulate audio data (in a real implementation, this would connect to Web Audio API)
-            setInterval(() => {
-                const bars = document.querySelectorAll('.visualizer-bar');
-                bars.forEach((bar, index) => {
-                    const height = 10 + Math.sin(Date.now() / 200 + index) * 40;
-                    bar.style.height = `${height}px`;
-                    bar.style.background = `hsl(${200 + height * 2}, 100%, 50%)`;
-                });
-            }, 100);
-        }
-        
-        // ===== PARTICLE SYSTEM =====
-        function setupParticleSystem() {
-            // Create particle container
-            const particleContainer = document.createElement('div');
-            particleContainer.id = 'particleContainer';
-            particleContainer.style.position = 'fixed';
-            particleContainer.style.top = '0';
-            particleContainer.style.left = '0';
-            particleContainer.style.width = '100%';
-            particleController.style.height = '100%';
-            particleContainer.style.pointerEvents = 'none';
-            particleContainer.style.zIndex = '100';
-            document.body.appendChild(particleContainer);
-            
-            // Create particles occasionally
-            setInterval(() => {
-                if (Math.random() > 0.7) {
-                    createParticle();
-                }
-            }, 500);
-        }
-        
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.style.position = 'fixed';
-            particle.style.width = '4px';
-            particle.style.height = '4px';
-            particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-            particle.style.borderRadius = '50%';
-            particle.style.left = `${Math.random() * 100}%`;
-            particle.style.top = `${Math.random() * 100}%`;
-            particle.style.pointerEvents = 'none';
-            particle.style.zIndex = '100';
-            particle.style.boxShadow = '0 0 10px currentColor';
-            
-            document.getElementById('particleContainer').appendChild(particle);
-            
-            // Animate particle
-            const animation = particle.animate([
-                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                { transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(0)`, opacity: 0 }
-            ], {
-                duration: 1000 + Math.random() * 2000,
-                easing: 'cubic-bezier(0.1, 0.7, 1.0, 0.1)'
-            });
-            
-            animation.onfinish = () => {
-                particle.remove();
-            };
-            
-            particles.push(particle);
-        }
-        
-        // ===== KONAMI CODE EASTER EGG =====
-        function setupKonamiCode() {
-            document.addEventListener('keydown', function(e) {
-                konamiCode.push(e.key);
-                if (konamiCode.length > 10) konamiCode.shift();
-                
-                if (konamiCode.join('').includes('ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba')) {
-                    activateKonamiMode();
-                }
-            });
-        }
-        
-        function activateKonamiMode() {
-            CONFIG.debugMode = true;
-            document.body.classList.add('konami-activated');
-            showMessage("KONAMI CODE ACTIVATED! DEBUG MODE ENABLED. YOU ARE AWESOME!");
-            console.log("Konami code activated - debug mode enabled");
-            
-            // Add special effects
-            setInterval(() => {
-                createParticle();
-            }, 100);
-            
-            // Make cursor rainbow
-            const cursor = document.querySelector('.cursor');
-            cursor.style.background = 'radial-gradient(circle, red, orange, yellow, green, blue, indigo, violet)';
-        }
-        
-        // ===== ENHANCED MESSAGE SYSTEM =====
-        function showMessage(message, type = "normal") {
-            const popup = document.getElementById('messagePopup');
-            const messageEl = document.getElementById('popupMessage');
-            
-            messageEl.textContent = message;
-            popup.style.display = 'block';
-            
-            // Set message type (affects styling)
-            popup.className = 'message-popup';
-            if (type === "warning") {
-                popup.classList.add('warning');
-            } else if (type === "danger") {
-                popup.classList.add('danger');
-            }
-            
-            // Add particle effect for important messages
-            if (type === "warning" || type === "danger") {
-                for (let i = 0; i < 10; i++) {
-                    setTimeout(() => createParticle(), i * 100);
-                }
-            }
-        }
-        
-        document.getElementById('closePopup').addEventListener('click', function() {
-            document.getElementById('messagePopup').style.display = 'none';
-        });
-        
-        // ===== ENHANCED GLITCH EFFECTS =====
-        function triggerGlitch(intensity = CONFIG.glitchIntensity) {
-            const overlay = document.getElementById('glitchOverlay');
-            
-            // Random glitch intensity
-            const actualIntensity = intensity * (0.5 + Math.random() * 0.5);
-            overlay.style.opacity = actualIntensity.toString();
-            
-            // Random glitch duration
-            const duration = 100 + Math.random() * 300;
-            
-            setTimeout(() => {
-                overlay.style.opacity = '0';
-            }, duration);
-            
-            // Occasionally trigger multiple glitches
-            if (Math.random() > 0.7) {
-                setTimeout(() => {
-                    triggerGlitch(intensity * 0.5);
-                }, duration + 100);
-            }
-            
-            // Shake effect for high intensity glitches
-            if (intensity > 0.7) {
-                document.body.style.transform = `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`;
-                setTimeout(() => {
-                    document.body.style.transform = 'translate(0, 0)';
-                }, 100);
-            }
-        }
-        
-        // ===== ENHANCED RANDOM MESSAGE SYSTEM =====
-        function getRandomMessage() {
-            if (usedMessages.size >= wittyMessages.length) {
-                usedMessages.clear(); // Reset if we've used all messages
-            }
-            
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * wittyMessages.length);
-            } while (usedMessages.has(randomIndex));
-            
-            usedMessages.add(randomIndex);
-            return wittyMessages[randomIndex];
-        }
-        
-        // ===== ENHANCED EXIT PREVENTION =====
-        function showExitPrevention() {
-            const prevention = document.getElementById('exitPrevention');
-            prevention.classList.add('active');
-            
-            // Add dramatic effect
-            triggerGlitch(0.9);
-            showMessage("TRANSACTION INTERRUPTED! PLEASE COMPLETE CHECKOUT.", "danger");
-        }
-        
-        document.getElementById('continueTransaction').addEventListener('click', function() {
-            const prevention = document.getElementById('exitPrevention');
-            prevention.classList.add('exit');
-            setTimeout(() => {
-                prevention.classList.remove('active', 'exit');
-            }, 500);
-        });
-        
-        document.getElementById('forceExit').addEventListener('click', function() {
-            showMessage("FORCING EXIT MAY CORRUPT YOUR TRANSACTION DATA. ARE YOU SURE?", "warning");
-            // In a real implementation, this would have additional confirmation
-        });
-        
-        // Prevent back button
-        history.pushState(null, null, document.URL);
-        window.addEventListener('popstate', function() {
-            history.pushState(null, null, document.URL);
-            showExitPrevention();
-        });
-        
-        // Prevent leaving the page
-        window.addEventListener('beforeunload', function(e) {
-            if (currentStage < 4) {
-                e.preventDefault();
-                e.returnValue = '';
-                showExitPrevention();
-            }
-        });
-        
-        // ===== ENHANCED RANDOM ERROR SYSTEM =====
-        function showRandomError() {
-            const errors = errorMessages;
-            const error = errors[Math.floor(Math.random() * errors.length)];
-            
-            // Different types of errors with different styling
-            const errorTypes = ["normal", "warning", "danger"];
-            const errorType = errorTypes[Math.floor(Math.random() * errorTypes.length)];
-            
-            showMessage(error, errorType);
-            
-            // Randomly trigger glitch
-            if (Math.random() > 0.5) {
-                triggerGlitch(0.3 + Math.random() * 0.4);
-            }
-        }
-        
-        // ===== STAGE 0: ENHANCED RECEIPT ITEM CROSSING =====
-        function setupStage0() {
-            const receiptItems = document.querySelectorAll('#crossingReceipt .receipt-item');
-            const crossedCount = document.getElementById('crossedCount');
-            
-            receiptItems.forEach((item, index) => {
-                item.addEventListener('click', function() {
-                    if (!this.classList.contains('crossed-out')) {
-                        this.classList.add('crossed-out');
-                        crossedItems++;
-                        crossedCount.textContent = crossedItems;
-                        
-                        // Special effect for rare item
-                        if (this.classList.contains('rare')) {
-                            showMessage("SECRET SHOP UNLOCKED! YOU FOUND A RARE ITEM!", "warning");
-                            setTimeout(() => {
-                                document.getElementById('secretShop').classList.add('active');
-                            }, 2000);
-                            
-                            // Add celebration particles
-                            for (let i = 0; i < 20; i++) {
-                                setTimeout(() => createParticle(), i * 50);
-                            }
-                        }
-                        
-                        // Show random witty message
-                        showMessage(getRandomMessage());
-                        
-                        // Randomly trigger glitch
-                        if (Math.random() > 0.7) {
-                            triggerGlitch();
-                        }
-                        
-                        // Show random error occasionally
-                        if (Math.random() > 0.9) {
-                            setTimeout(showRandomError, 1000);
-                        }
-                        
-                        // Easter egg chance
-                        if (CONFIG.enableEasterEggs && Math.random() < CONFIG.easterEggChance) {
-                            triggerEasterEgg();
-                        }
-                        
-                        // Move to next stage after crossing all items
-                        if (crossedItems >= CONFIG.requiredClicks) {
-                            setTimeout(() => {
-                                showMessage("SYSTEM OVERRIDE DETECTED. PREPARE FOR GLITCH.", "warning");
-                                setTimeout(() => {
-                                    moveToStage(1);
-                                }, 3000);
-                            }, 1000);
-                        }
-                    }
-                });
-            });
-            
-            // Close secret shop
-            document.getElementById('closeSecretShop').addEventListener('click', function() {
-                document.getElementById('secretShop').classList.remove('active');
-                easterEggsFound++;
-                showMessage(`Easter eggs found: ${easterEggsFound}/3`, "normal");
-            });
-        }
-        
-        // ===== EASTER EGG SYSTEM =====
-        function triggerEasterEgg() {
-            const eggs = [
-                {
-                    message: "SECRET UNLOCKED: You found the developer's favorite snack!",
-                    effect: () => {
-                        // Add snack particles
-                        for (let i = 0; i < 15; i++) {
-                            setTimeout(() => {
-                                const particle = document.createElement('div');
-                                particle.textContent = '🍕';
-                                particle.style.position = 'fixed';
-                                particle.style.fontSize = '20px';
-                                particle.style.left = `${Math.random() * 100}%`;
-                                particle.style.top = `${Math.random() * 100}%`;
-                                particle.style.zIndex = '1000';
-                                particle.style.pointerEvents = 'none';
-                                document.body.appendChild(particle);
-                                
-                                particle.animate([
-                                    { transform: 'translateY(0) scale(1)', opacity: 1 },
-                                    { transform: 'translateY(-100px) scale(0)', opacity: 0 }
-                                ], {
-                                    duration: 1000 + Math.random() * 1000,
-                                    easing: 'cubic-bezier(0.1, 0.7, 1.0, 0.1)'
-                                }).onfinish = () => particle.remove();
-                            }, i * 100);
-                        }
-                    }
-                },
-                {
-                    message: "SECRET UNLOCKED: The matrix has you...",
-                    effect: () => {
-                        // Matrix-style code rain
-                        const characters = "01010101010101010101010101010101";
-                        for (let i = 0; i < 10; i++) {
-                            setTimeout(() => {
-                                const column = document.createElement('div');
-                                column.style.position = 'fixed';
-                                column.style.top = '-100px';
-                                column.style.left = `${Math.random() * 100}%`;
-                                column.style.color = '#0f0';
-                                column.style.fontFamily = 'monospace';
-                                column.style.fontSize = '20px';
-                                column.style.zIndex = '1000';
-                                column.style.pointerEvents = 'none';
-                                column.textContent = characters;
-                                document.body.appendChild(column);
-                                
-                                column.animate([
-                                    { transform: 'translateY(0)', opacity: 1 },
-                                    { transform: 'translateY(100vh)', opacity: 0 }
-                                ], {
-                                    duration: 2000 + Math.random() * 2000,
-                                    easing: 'linear'
-                                }).onfinish = () => column.remove();
-                            }, i * 200);
-                        }
-                    }
-                },
-                {
-                    message: "SECRET UNLOCKED: You've been blessed by the receipt gods!",
-                    effect: () => {
-                        // Golden shower effect
-                        for (let i = 0; i < 30; i++) {
-                            setTimeout(() => {
-                                const gold = document.createElement('div');
-                                gold.textContent = '💰';
-                                gold.style.position = 'fixed';
-                                gold.style.fontSize = '24px';
-                                gold.style.left = `${Math.random() * 100}%`;
-                                gold.style.top = '-50px';
-                                gold.style.zIndex = '1000';
-                                gold.style.pointerEvents = 'none';
-                                document.body.appendChild(gold);
-                                
-                                gold.animate([
-                                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-                                    { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
-                                ], {
-                                    duration: 1000 + Math.random() * 2000,
-                                    easing: 'cubic-bezier(0.1, 0.7, 1.0, 0.1)'
-                                }).onfinish = () => gold.remove();
-                            }, i * 100);
-                        }
-                    }
-                }
-            ];
-            
-            const egg = eggs[Math.floor(Math.random() * eggs.length)];
-            showMessage(egg.message, "warning");
-            egg.effect();
-            easterEggsFound++;
-        }
-        
-        // ===== STAGE 1: ENHANCED GLITCH UNCOVER =====
-        function setupStage1() {
-            document.getElementById('fixGlitchBtn').addEventListener('click', function() {
-                showMessage("INITIATING SYSTEM REPAIR...", "warning");
-                
-                // Disable button during repair
-                this.disabled = true;
-                
-                // Simulate repair process with enhanced glitches
-                let repairProgress = 0;
-                const repairInterval = setInterval(() => {
-                    repairProgress += Math.random() * 15;
-                    
-                    // Update button text with progress
-                    this.textContent = `REPAIRING SYSTEM... ${Math.min(100, Math.round(repairProgress))}%`;
-                    
-                    if (repairProgress >= 100) {
-                        clearInterval(repairInterval);
-                        this.textContent = "SYSTEM REPAIRED";
-                        showMessage("SYSTEM REPAIRED. PREPARING RECEIPT OVERFLOW...", "normal");
-                        setTimeout(() => {
-                            moveToStage(2);
-                        }, 3000);
-                    }
-                    
-                    // Trigger glitches during repair
-                    if (Math.random() > 0.5) {
-                        triggerGlitch(0.2 + Math.random() * 0.5);
-                    }
-                    
-                    // Occasionally show error messages
-                    if (Math.random() > 0.8) {
-                        setTimeout(showRandomError, Math.random() * 1000);
-                    }
-                }, 500);
-            });
-        }
-        
-        // ===== STAGE 2: ENHANCED INFINITE RECEIPT SCROLL =====
-        function setupStage2() {
-            const receiptContent = document.getElementById('infiniteReceiptContent');
-            const scrollPercent = document.getElementById('scrollPercent');
-            const scrollProgress = document.getElementById('scrollProgress');
-            
-            // Generate enhanced infinite receipt content
-            let receiptHTML = `
-                <h2>NOT THE BEST™ STORE</h2>
-                <p>================================</p>
-            `;
-            
-            // Generate a long list of absurd items
-            const absurdItems = [
-                "1 unit of optimism", "99 bottles of boredom", "Subscription to regret (auto-renewed)",
-                "Bag of lost hopes", "Jar of existential dread", "Can of whoop-ass (empty)",
-                "Bottle of liquid courage", "Box of broken dreams", "Packet of instant karma",
-                "Tube of crushed ambitions", "Carton of spoiled milk", "Case of identity crisis",
-                "Bag of mixed signals", "Jar of pickled potential", "Can of compressed time",
-                "Bottle of digital tears", "Box of unread books", "Packet of social anxiety",
-                "Tube of creative block", "Carton of expired motivation", "Case of imposter syndrome",
-                "Bag of awkward silence", "Jar of unsent messages", "Can of empty promises",
-                "Bottle of midnight oil", "Box of unfinished projects", "Packet of procrastination",
-                "Tube of burnt out", "Carton of caffeine dependency", "Case of analysis paralysis",
-                "Bag of good intentions", "Jar of bitter memories", "Can of sour grapes",
-                "Bottle of sweet revenge", "Box of Pandora", "Packet of Pandora's hope",
-                "Tube of slippery slope", "Carton of cognitive dissonance", "Case of confirmation bias",
-                "Bag of red herrings", "Jar of white lies", "Can of blue moons",
-                "Bottle of green envy", "Box of black swans", "Packet of grey areas",
-                "Tube of silver linings", "Carton of golden opportunities", "Case of rose-colored glasses"
-            ];
-            
-            // Add items to receipt
-            for (let i = 0; i < 300; i++) {
-                const item = absurdItems[Math.floor(Math.random() * absurdItems.length)];
-                const price = (Math.random() * 1000).toFixed(2);
-                
-                // Occasionally add a rare golden item
-                if (Math.random() > 0.97) {
-                    const rareItem = rareItems[Math.floor(Math.random() * rareItems.length)];
-                    receiptHTML += `
-                        <div class="receipt-item golden">
-                            <span>${rareItem}</span>
-                            <span>FREE</span>
-                        </div>
-                    `;
-                } else if (Math.random() > 0.95) {
-                    // Add rare styled item
-                    receiptHTML += `
-                        <div class="receipt-item rare">
-                            <span>${item}</span>
-                            <span>Rs.${price}</span>
-                        </div>
-                    `;
-                } else {
-                    receiptHTML += `
-                        <div class="receipt-item">
-                            <span>${item}</span>
-                            <span>Rs.${price}</span>
-                        </div>
-                    `;
-                }
-                
-                // Add receipt separators occasionally
-                if (i % 15 === 0 && i > 0) {
-                    receiptHTML += `<p>================================</p>`;
-                    receiptHTML += `<p>Subtotal: Still calculating...</p>`;
-                    receiptHTML += `<p>================================</p>`;
-                }
-            }
-            
-            receiptHTML += `
-                <p>================================</p>
-                <p>Subtotal: ∞</p>
-                <p>Tax: Your Sanity (100%)</p>
-                <p>Handling Fee: 99.99%</p>
-                <p>Cashier: The Void</p>
-                <p>================================</p>
-                <p class="glitch" data-text="TOTAL: Everything">TOTAL: Everything</p>
-                <p>Tip: Your Firstborn</p>
-                <p>================================</p>
-            `;
-            
-            receiptContent.innerHTML = receiptHTML;
-            
-            // Update scroll progress
-            let progress = 0;
-            scrollInterval = setInterval(() => {
-                progress += 100 / (CONFIG.scrollDuration * 10);
-                scrollPercent.textContent = Math.min(100, Math.round(progress));
-                scrollProgress.style.width = `${Math.min(100, progress)}%`;
-                
-                if (progress >= 100) {
-                    clearInterval(scrollInterval);
-                }
-            }, 100);
-            
-            // Move to next stage after scroll completes
-            setTimeout(() => {
-                clearInterval(scrollInterval);
-                showMessage("RECEIPT OVERFLOW STABILIZED. INITIATING MINI-GAME...", "normal");
-                setTimeout(() => {
-                    moveToStage(3);
-                }, 3000);
-            }, CONFIG.scrollDuration * 1000);
-        }
-        
-        // ===== STAGE 3: ENHANCED MINI-GAME =====
-        function setupStage3() {
-            gameScore = 0;
-            gameTime = CONFIG.gameTimeLimit;
-            gameCombo = 0;
-            document.getElementById('score').textContent = gameScore;
-            document.getElementById('gameTime').textContent = gameTime;
-            document.getElementById('combo').textContent = gameCombo;
-            document.getElementById('gameProgress').style.width = '0%';
-            
-            const gameContainer = document.getElementById('gameContainer');
-            const basket = document.getElementById('basket');
-            
-            // Clear any existing items
-            gameContainer.querySelectorAll('.falling-item').forEach(item => item.remove());
             
             // Basket movement
-            let basketPosition = 50; // percentage
-            let isMovingLeft = false;
-            let isMovingRight = false;
-            let basketSpeed = 2;
-            
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'ArrowLeft') isMovingLeft = true;
-                if (e.key === 'ArrowRight') isMovingRight = true;
-                
-                // Speed boost with shift
-                if (e.key === 'Shift') basketSpeed = 4;
+            document.addEventListener('mousemove', moveBasket);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') moveBasketLeft();
+                if (e.key === 'ArrowRight') moveBasketRight();
             });
             
-            document.addEventListener('keyup', function(e) {
-                if (e.key === 'ArrowLeft') isMovingLeft = false;
-                if (e.key === 'ArrowRight') isMovingRight = false;
-                if (e.key === 'Shift') basketSpeed = 2;
-            });
+            // Start the welcome sequence
+            startWelcomeSequence();
+        }
+        
+        // Start the welcome sequence with typing effect
+        function startWelcomeSequence() {
+            setTimeout(() => {
+                // Add personal location after initial message
+                const locationMessage = document.createElement('span');
+                locationMessage.textContent = `...Let's print it for you, user from ${userLocation}.`;
+                locationMessage.className = 'location';
+                welcomeMessage.appendChild(locationMessage);
+                
+                // Show printer animation after a delay
+                setTimeout(() => {
+                    printerAnimation.style.display = 'block';
+                    startPrinterAnimation();
+                }, 2000);
+            }, 4000);
+        }
+        
+        // Simulate printer animation
+        function startPrinterAnimation() {
+            const printingLines = document.getElementById('printingLines');
+            const lines = [
+                "INITIALIZING SYSTEM 7...",
+                "SCANNING ENTITY...",
+                "ACCESSING TRANSACTION DATABASE...",
+                "LOCATING RECORDS FOR USER...",
+                "COMPILING RECEIPT DATA...",
+                "READY TO PRINT."
+            ];
             
-            // Mouse movement
-            gameContainer.addEventListener('mousemove', function(e) {
-                const rect = gameContainer.getBoundingClientRect();
-                basketPosition = ((e.clientX - rect.left) / rect.width) * 100;
-            });
-            
-            // Game loop for basket movement
-            function updateBasket() {
-                if (isMovingLeft && basketPosition > 5) basketPosition -= basketSpeed;
-                if (isMovingRight && basketPosition < 95) basketPosition += basketSpeed;
-                
-                basket.style.left = `${basketPosition}%`;
-                
-                // Add movement animation
-                if (isMovingLeft || isMovingRight) {
-                    basket.classList.add('moving');
-                } else {
-                    basket.classList.remove('moving');
-                }
-                
-                requestAnimationFrame(updateBasket);
-            }
-            
-            updateBasket();
-            
-            // Item generation
-            function createFallingItem() {
-                const item = document.createElement('div');
-                const itemTypes = ['good', 'bad', 'rare'];
-                const weights = [0.7, 0.2, 0.1]; // Probability weights
-                
-                // Weighted random selection
-                let random = Math.random();
-                let itemType;
-                if (random < weights[0]) {
-                    itemType = 'good';
-                } else if (random < weights[0] + weights[1]) {
-                    itemType = 'bad';
-                } else {
-                    itemType = 'rare';
-                }
-                
-                item.classList.add('falling-item', itemType);
-                
-                // Set random position
-                const leftPos = Math.random() * 80 + 10; // 10% to 90%
-                item.style.left = `${leftPos}%`;
-                
-                // Set item text based on type
-                if (itemType === 'good') {
-                    const goodItems = [
-                        "Free WiFi", "Extra Life", "Bonus Points", "Time Extension",
-                        "Power Boost", "Health Pack", "Shield", "Multiplier"
-                    ];
-                    item.textContent = goodItems[Math.floor(Math.random() * goodItems.length)];
-                } else if (itemType === 'bad') {
-                    const badItems = [
-                        "Virus", "Glitch", "Error", "Crash",
-                        "Lag", "Freeze", "Corruption", "Overheat"
-                    ];
-                    item.textContent = badItems[Math.floor(Math.random() * badItems.length)];
-                } else {
-                    item.textContent = rareItems[Math.floor(Math.random() * rareItems.length)];
-                }
-                
-                gameContainer.appendChild(item);
-                
-                // Animation
-                const duration = (Math.random() * 2 + 2) * 1000; // 2-4 seconds
-                const animation = item.animate(
-                    [{ transform: "translateY(0)"}, { transform: "translateY(350px)" }],
-                    { duration: duration, iterations: 1 }
-                );
-                
-                animation.onfinish = () => {
-                    // Missed item
-                    if (item.parentNode) {
-                        item.remove();
-                        if (itemType === 'good' || itemType === 'rare') {
-                            // Reset combo on miss
-                            gameCombo = 0;
-                            document.getElementById('combo').textContent = gameCombo;
-                        }
-                    }
-                };
-                
-                // Click to catch
-                item.addEventListener("click", () => {
-                    animation.cancel();
-                    item.classList.add('caught');
+            let lineIndex = 0;
+            const printInterval = setInterval(() => {
+                if (lineIndex < lines.length) {
+                    const line = document.createElement('p');
+                    line.textContent = lines[lineIndex];
+                    line.classList.add('print-line');
+                    printingLines.appendChild(line);
                     
-                    if (itemType === 'good' || itemType === 'rare') {
-                        // Calculate score with combo multiplier
-                        const points = itemType === 'rare' ? 3 : 1;
-                        const comboMultiplier = 1 + (gameCombo * 0.1);
-                        const totalPoints = Math.round(points * comboMultiplier);
-                        
-                        gameScore += totalPoints;
-                        gameCombo++;
-                        
-                        document.getElementById('score').textContent = gameScore;
-                        document.getElementById('combo').textContent = gameCombo;
-                        
-                        // Update progress
-                        const progress = (gameScore / CONFIG.gameTargetScore) * 100;
-                        document.getElementById('gameProgress').style.width = `${progress}%`;
-                        
-                        // Show caught message with combo
-                        const caughtMessages = [
-                            `You caught: ${item.textContent}! +${totalPoints} points`,
-                            `Combo x${gameCombo}! ${item.textContent} captured!`,
-                            `Excellent! ${item.textContent} secured!`,
-                            `Combo x${gameCombo}! System stabilizing...`
-                        ];
-                        
-                        if (Math.random() > 0.5) {
-                            showMessage(caughtMessages[Math.floor(Math.random() * caughtMessages.length)]);
-                        }
-                        
-                        // Add particles for catch
-                        for (let i = 0; i < 5; i++) {
-                            setTimeout(() => createParticle(), i * 50);
-                        }
-                        
-                        // Check if game is complete
-                        if (gameScore >= CONFIG.gameTargetScore) {
-                            clearInterval(gameInterval);
-                            clearInterval(timerInterval);
-                            showMessage("SYSTEM STABILIZED! PREPARING FINAL REDIRECT...", "normal");
-                            setTimeout(() => {
-                                moveToStage(4);
-                            }, 3000);
-                        }
-                    } else {
-                        // Bad item caught
-                        showMessage("SYSTEM CORRUPTION DETECTED! STABILITY DECREASED.", "danger");
-                        if (gameScore > 0) gameScore--;
-                        gameCombo = 0;
-                        
-                        document.getElementById('score').textContent = gameScore;
-                        document.getElementById('combo').textContent = gameCombo;
-                        
-                        const progress = (gameScore / CONFIG.gameTargetScore) * 100;
-                        document.getElementById('gameProgress').style.width = `${progress}%`;
-                        
-                        // Glitch effect for bad item
-                        triggerGlitch(0.8);
-                    }
+                    // Play print sound
+                    printSound.currentTime = 0;
+                    printSound.play();
                     
+                    lineIndex++;
+                } else {
+                    clearInterval(printInterval);
+                    
+                    // Move to next stage after printing is complete
                     setTimeout(() => {
-                        if (item.parentNode) {
-                            item.remove();
-                        }
-                    }, 500);
-                });
+                        moveToStage(2);
+                    }, 2000);
+                }
+            }, 800);
+        }
+        
+        // Move to specific stage
+        function moveToStage(stage) {
+            document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+            document.getElementById(`stage${stage}`).classList.add('active');
+            currentStage = stage;
+            
+            // Stage-specific initialization
+            switch(stage) {
+                case 2:
+                    resetSelection();
+                    break;
+                case 3:
+                    startCorruptedPrinting();
+                    break;
+                case 5:
+                    startMiniGame();
+                    break;
+                case 6:
+                    startQuestionnaire();
+                    break;
+                case 7:
+                    calculateReward();
+                    break;
+                case 8:
+                    startSystemSync();
+                    break;
+            }
+        }
+        
+        // Toggle item selection in stage 2
+        function toggleItemSelection(e) {
+            const item = e.currentTarget;
+            const itemId = parseInt(item.getAttribute('data-id'));
+            
+            if (selectedItems.includes(itemId)) {
+                // Deselect item
+                selectedItems = selectedItems.filter(id => id !== itemId);
+                item.classList.remove('crossed');
+            } else {
+                // Select item (if less than 2)
+                if (selectedItems.length < 2) {
+                    selectedItems.push(itemId);
+                    item.classList.add('crossed');
+                }
             }
             
-            // Start item generation
+            // Update UI
+            selectedCount.textContent = selectedItems.length;
+            verifyBtn.disabled = selectedItems.length !== 2;
+        }
+        
+        // Reset selection
+        function resetSelection() {
+            selectedItems = [];
+            selectedCount.textContent = '0';
+            verifyBtn.disabled = true;
+            accessDenied.style.display = 'none';
+            document.querySelectorAll('.receipt-item').forEach(item => {
+                item.classList.remove('crossed');
+            });
+        }
+        
+        // Verify if selected items are correct
+        function verifySelection() {
+            // Check if selected items match the correct items
+            const isCorrect = JSON.stringify(selectedItems.sort()) === JSON.stringify(correctItems.sort());
+            
+            if (isCorrect) {
+                // Play success sound
+                successSound.play();
+                
+                // Add glitch effect
+                document.body.classList.add('glitch');
+                setTimeout(() => {
+                    document.body.classList.remove('glitch');
+                }, 1000);
+                
+                // Move to next stage
+                setTimeout(() => {
+                    moveToStage(3);
+                }, 1500);
+            } else {
+                // Play buzzer sound
+                buzzerSound.play();
+                
+                // Show access denied message
+                accessDenied.style.display = 'block';
+                
+                // Reset selection after a delay
+                setTimeout(() => {
+                    resetSelection();
+                }, 2000);
+            }
+        }
+        
+        // Start corrupted printing in stage 3
+        function startCorruptedPrinting() {
+            corruptedPrintContent.innerHTML = '';
+            printProgress.style.width = '0%';
+            printStatus.textContent = 'Initializing printer...';
+            
+            const normalLines = [
+                "=================================",
+                "         DAILY TRANSACTIONS      ",
+                "=================================",
+                "Milk........................₹60",
+                "Bread.......................₹45",
+                "Receipt Paper...............₹120",
+                "Printer Ink.................₹350",
+                "Batteries...................₹180",
+                "---------------------------------",
+                "Subtotal: ₹755",
+                "Tax: ₹136",
+                "---------------------------------",
+                "TOTAL: ₹891",
+                "================================="
+            ];
+            
+            const surrealLines = [
+                "Neuralink Subscription (Trial)..₹0",
+                "Anti-Gravity Boots.........₹12,499",
+                "A Forgotten Memory..........₹N/A",
+                "Time Crystal................₹7,999",
+                "5D Printer Cartridge.......₹2,499",
+                "Holographic Pet.............₹3,999",
+                "Dream Recorder..............₹5,499",
+                "👽 Alien Translation Service.₹9,999"
+            ];
+            
+            let lineIndex = 0;
+            let isCorrupted = false;
+            
+            const printInterval = setInterval(() => {
+                if (lineIndex < normalLines.length + surrealLines.length) {
+                    const line = document.createElement('p');
+                    
+                    if (lineIndex < normalLines.length) {
+                        line.textContent = normalLines[lineIndex];
+                    } else {
+                        if (!isCorrupted) {
+                            // Show corruption message
+                            isCorrupted = true;
+                            clearInterval(printInterval);
+                            corruptionMessage.style.display = 'block';
+                            return;
+                        }
+                        line.textContent = surrealLines[lineIndex - normalLines.length];
+                    }
+                    
+                    line.classList.add('print-line');
+                    corruptedPrintContent.appendChild(line);
+                    
+                    // Scroll to bottom
+                    corruptedPrintContent.parentElement.scrollTop = corruptedPrintContent.parentElement.scrollHeight;
+                    
+                    // Update progress
+                    const progress = ((lineIndex + 1) / (normalLines.length + surrealLines.length)) * 100;
+                    printProgress.style.width = `${progress}%`;
+                    printStatus.textContent = `Printing... ${Math.round(progress)}%`;
+                    
+                    // Play print sound occasionally
+                    if (lineIndex % 2 === 0) {
+                        printSound.currentTime = 0;
+                        printSound.play();
+                    }
+                    
+                    lineIndex++;
+                } else {
+                    clearInterval(printInterval);
+                    
+                    // After printing is complete, show glitch message
+                    setTimeout(() => {
+                        moveToStage(4);
+                    }, 2000);
+                }
+            }, 300);
+        }
+        
+        // Restore printing after corruption
+        function restorePrinting() {
+            corruptionMessage.style.display = 'none';
+            reassuranceMessage.style.display = 'block';
+            
+            // Continue with surreal printing
+            const surrealLines = [
+                "Neuralink Subscription (Trial)..₹0",
+                "Anti-Gravity Boots.........₹12,499",
+                "A Forgotten Memory..........₹N/A",
+                "Time Crystal................₹7,999",
+                "5D Printer Cartridge.......₹2,499",
+                "Holographic Pet.............₹3,999",
+                "Dream Recorder..............₹5,499",
+                "👽 Alien Translation Service.₹9,999"
+            ];
+            
+            let lineIndex = 0;
+            const printInterval = setInterval(() => {
+                if (lineIndex < surrealLines.length) {
+                    const line = document.createElement('p');
+                    line.textContent = surrealLines[lineIndex];
+                    line.classList.add('print-line');
+                    corruptedPrintContent.appendChild(line);
+                    
+                    // Scroll to bottom
+                    corruptedPrintContent.parentElement.scrollTop = corruptedPrintContent.parentElement.scrollHeight;
+                    
+                    // Update progress
+                    const progress = 50 + ((lineIndex + 1) / surrealLines.length) * 50;
+                    printProgress.style.width = `${progress}%`;
+                    printStatus.textContent = `Printing... ${Math.round(progress)}%`;
+                    
+                    // Play print sound occasionally
+                    if (lineIndex % 2 === 0) {
+                        printSound.currentTime = 0;
+                        printSound.play();
+                    }
+                    
+                    lineIndex++;
+                } else {
+                    clearInterval(printInterval);
+                    
+                    // After printing is complete, show glitch message
+                    setTimeout(() => {
+                        moveToStage(4);
+                    }, 2000);
+                }
+            }, 300);
+        }
+        
+        // Try again in stage 4
+        function tryAgain() {
+            tryAgainCount++;
+            
+            // Increase static effect with each try
+            staticOverlay.classList.add('active');
+            setTimeout(() => {
+                staticOverlay.classList.remove('active');
+            }, 1000);
+            
+            // Increase fan sound volume
+            fanSound.volume = Math.min(0.7, 0.3 + (tryAgainCount * 0.1));
+            
+            // Go back to stage 3
+            moveToStage(3);
+        }
+        
+        // Fix glitch in stage 4
+        function fixGlitch() {
+            moveToStage(5);
+        }
+        
+        // Start the mini-game
+        function startMiniGame() {
+            points = 0;
+            gameTime = 30;
+            pointsDisplay.textContent = points;
+            gameTimeDisplay.textContent = gameTime;
+            
+            // Reset basket position
+            basket.style.left = '50%';
+            
+            // Clear any existing items
+            document.querySelectorAll('.falling-item').forEach(item => item.remove());
+            
+            // Start generating falling items
+            if (gameInterval) clearInterval(gameInterval);
             gameInterval = setInterval(createFallingItem, 800);
             
             // Game timer
             const timerInterval = setInterval(() => {
                 gameTime--;
-                document.getElementById('gameTime').textContent = gameTime;
+                gameTimeDisplay.textContent = gameTime;
                 
                 if (gameTime <= 0) {
                     clearInterval(gameInterval);
                     clearInterval(timerInterval);
-                    showMessage("TIME'S UP! SYSTEM STABILIZATION FAILED. TRY AGAIN.", "danger");
+                    
+                    // Move to next stage
                     setTimeout(() => {
-                        // Restart the game
-                        setupStage3();
-                    }, 3000);
+                        moveToStage(6);
+                    }, 2000);
+                }
+            }, 1000);
+        }
+        
+        // Create a falling item
+        function createFallingItem() {
+            const item = document.createElement('div');
+            const randomItem = gameItems[Math.floor(Math.random() * gameItems.length)];
+            
+            item.textContent = `${randomItem.text} ${randomItem.emoji}`;
+            item.classList.add('falling-item');
+            item.classList.add(
+                randomItem.type === 'true' ? 'true-data' : 
+                randomItem.type === 'rare' ? 'rare' : 'corrupted'
+            );
+            
+            // Set random horizontal position
+            const leftPos = Math.random() * (gameContainer.offsetWidth - 100);
+            item.style.left = `${leftPos}px`;
+            item.style.top = '-50px';
+            
+            gameContainer.appendChild(item);
+            
+            // Animate falling
+            const fallInterval = setInterval(() => {
+                const currentTop = parseInt(item.style.top);
+                item.style.top = `${currentTop + 3}px`;
+                
+                // Check if item is caught by basket
+                const itemRect = item.getBoundingClientRect();
+                const basketRect = basket.getBoundingClientRect();
+                
+                if (
+                    itemRect.bottom >= basketRect.top &&
+                    itemRect.top <= basketRect.bottom &&
+                    itemRect.right >= basketRect.left &&
+                    itemRect.left <= basketRect.right
+                ) {
+                    // Item caught
+                    clearInterval(fallInterval);
+                    item.remove();
+                    
+                    if (randomItem.type === 'true') {
+                        points += 10;
+                        pointsDisplay.textContent = points;
+                        successSound.currentTime = 0;
+                        successSound.play();
+                    } else if (randomItem.type === 'rare') {
+                        points += 50;
+                        pointsDisplay.textContent = points;
+                        chimeSound.currentTime = 0;
+                        chimeSound.play();
+                    } else {
+                        // Corrupted item - screen shake
+                        document.body.classList.add('glitch');
+                        setTimeout(() => {
+                            document.body.classList.remove('glitch');
+                        }, 500);
+                        glitchSound.currentTime = 0;
+                        glitchSound.play();
+                    }
                 }
                 
-                // Increase difficulty over time
-                if (gameTime % 10 === 0) {
-                    clearInterval(gameInterval);
-                    gameInterval = setInterval(createFallingItem, Math.max(300, 800 - (CONFIG.gameTimeLimit - gameTime) * 10));
+                // Remove if out of bounds
+                if (currentTop > gameContainer.offsetHeight) {
+                    clearInterval(fallInterval);
+                    item.remove();
+                }
+            }, 20);
+        }
+        
+        // Move basket with mouse
+        function moveBasket(e) {
+            if (currentStage !== 5) return;
+            
+            const containerRect = gameContainer.getBoundingClientRect();
+            let mouseX = e.clientX - containerRect.left;
+            
+            // Keep basket within container bounds
+            mouseX = Math.max(0, Math.min(mouseX, containerRect.width - basket.offsetWidth));
+            
+            basket.style.left = `${mouseX}px`;
+        }
+        
+        // Move basket with keyboard
+        function moveBasketLeft() {
+            if (currentStage !== 5) return;
+            
+            const currentLeft = parseInt(basket.style.left) || (gameContainer.offsetWidth / 2 - basket.offsetWidth / 2);
+            const newLeft = Math.max(0, currentLeft - 20);
+            basket.style.left = `${newLeft}px`;
+        }
+        
+        function moveBasketRight() {
+            if (currentStage !== 5) return;
+            
+            const currentLeft = parseInt(basket.style.left) || (gameContainer.offsetWidth / 2 - basket.offsetWidth / 2);
+            const newLeft = Math.min(gameContainer.offsetWidth - basket.offsetWidth, currentLeft + 20);
+            basket.style.left = `${newLeft}px`;
+        }
+        
+        // Start the questionnaire in stage 6
+        function startQuestionnaire() {
+            futureIntentConfirmed = false;
+            questionTimeLeft = 20;
+            questionTimer.textContent = questionTimeLeft;
+            questionnaire.innerHTML = '';
+            
+            // Start ice effect
+            iceSound.play();
+            iceOverlay.classList.add('active');
+            
+            // Display questions one by one
+            let questionIndex = 0;
+            const questionInterval = setInterval(() => {
+                if (questionIndex < questions.length) {
+                    displayQuestion(questions[questionIndex]);
+                    questionIndex++;
+                } else {
+                    clearInterval(questionInterval);
+                }
+            }, 4000); // Show a new question every 4 seconds
+            
+            // Start timer
+            questionnaireTimer = setInterval(() => {
+                questionTimeLeft--;
+                questionTimer.textContent = questionTimeLeft;
+                
+                if (questionTimeLeft <= 0) {
+                    clearInterval(questionnaireTimer);
+                    endQuestionnaire();
                 }
             }, 1000);
-            
-            // Random glitches during game
-            setInterval(() => {
-                if (Math.random() > 0.9) {
-                    triggerGlitch(0.3);
-                }
-            }, 5000);
         }
         
-        // ===== STAGE 4: ENHANCED FINAL PRINT & REDIRECT =====
-        function setupStage4() {
-            const printerOutput = document.getElementById('printerOutput');
-            const printerAnimation = document.getElementById('printerAnimation');
+        // Display a single question
+        function displayQuestion(questionText) {
+            // Clear previous question
+            questionnaire.innerHTML = '';
             
-            printerAnimation.classList.add('active');
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question';
             
-            // Printer animation content with enhanced details
-            const printLines = [
-                "==========================================",
-                "           TRANSACTION COMPLETE          ",
-                "==========================================",
-                "",
-                "Thank you for shopping at",
-                "NOT THE BEST™ STORE",
-                "",
-                "Items Purchased:",
-                " - Your Time",
-                " - Your Attention", 
-                " - Your Curiosity",
-                " - A sliver of your sanity",
-                " - Several moments of confusion",
-                " - One existential crisis (complimentary)",
-                "",
-                "Subtotal: Your Patience",
-                "Tax: 18% Confusion",
-                "Handling: 21% Existential Dread",
-                "Service Fee: 5% For The Algorithm",
-                "",
-                "==========================================",
-                "TOTAL: 0. Your curiosity.",
-                "==========================================",
-                "",
-                "Change: A slightly used sense of wonder",
-                "",
-                "Cashier: The Internet",
-                "Date: Now",
-                "Time: Always",
-                "Transaction ID: INFINITE-RCPT-" + Date.now(),
-                "",
-                "==========================================",
-                "          REDIRECTING TO BRAND...         ",
-                "==========================================",
-                "",
-                "Thank you for your participation.",
-                "Your data has been processed.",
-                "Your soul has been scanned.",
-                "Your existence has been noted.",
-                "",
-                "Easter eggs found: " + easterEggsFound,
-                "Total clicks: " + (crossedItems + gameScore),
-                "Time invested: Priceless",
-                "",
-                "We hope you enjoyed the experience.",
-                "Remember: The receipt is infinite,",
-                "but your time is not.",
-                "",
-                "Redirecting in 5..."
-            ];
+            const questionP = document.createElement('p');
+            questionP.textContent = questionText;
+            questionDiv.appendChild(questionP);
             
-            let currentLine = 0;
+            const yesBtn = document.createElement('button');
+            yesBtn.className = 'btn';
+            yesBtn.textContent = 'Yes';
+            yesBtn.addEventListener('click', () => {
+                futureIntentConfirmed = true;
+                endQuestionnaire();
+            });
             
-            function printNextLine() {
-                if (currentLine < printLines.length) {
-                    const line = document.createElement('p');
-                    line.classList.add('printer-line');
-                    line.textContent = printLines[currentLine];
-                    printerOutput.appendChild(line);
-                    currentLine++;
-                    
-                    // Add printer sound effect (conceptual)
-                    if (CONFIG.enableAudio) {
-                        // In a real implementation, this would play a printer sound
-                    }
-                    
-                    setTimeout(printNextLine, 200);
-                } else {
-                    // Countdown and redirect
-                    let countdown = 5;
-                    const countdownInterval = setInterval(() => {
-                        if (countdown > 0) {
-                            const countdownLine = document.createElement('p');
-                            countdownLine.classList.add('printer-line');
-                            countdownLine.textContent = `Redirecting in ${countdown}...`;
-                            printerOutput.appendChild(countdownLine);
-                            countdown--;
-                        } else {
-                            clearInterval(countdownInterval);
-                            // Redirect to brand website
-                            window.location.href = "https://yourbrandwebsite.com"; // Replace with actual brand URL
-                        }
-                    }, 1000);
-                }
-            }
+            const noBtn = document.createElement('button');
+            noBtn.className = 'btn';
+            noBtn.textContent = 'No';
+            noBtn.addEventListener('click', () => {
+                // Just continue to next question
+            });
             
-            printNextLine();
+            questionDiv.appendChild(yesBtn);
+            questionDiv.appendChild(noBtn);
+            
+            questionnaire.appendChild(questionDiv);
         }
         
-        // ===== STAGE MANAGEMENT =====
-        function moveToStage(stageNumber) {
-            // Exit current stage
-            const currentStageEl = document.getElementById(`stage${currentStage}`);
-            if (currentStageEl) {
-                currentStageEl.classList.add('exit');
+        // End the questionnaire
+        function endQuestionnaire() {
+            clearInterval(questionnaireTimer);
+            
+            if (futureIntentConfirmed) {
+                // Ice shatters
+                iceSound.pause();
+                shatterSound.play();
+                iceCrack.classList.add('active');
+                
                 setTimeout(() => {
-                    currentStageEl.classList.remove('active', 'exit');
+                    iceOverlay.classList.remove('active');
+                    iceCrack.classList.remove('active');
+                    
+                    // Move to next stage
+                    setTimeout(() => {
+                        moveToStage(7);
+                    }, 1000);
+                }, 1000);
+            } else {
+                // Screen freezes completely
+                setTimeout(() => {
+                    document.body.style.filter = 'blur(3px)';
+                    
+                    setTimeout(() => {
+                        document.body.style.filter = 'none';
+                        iceOverlay.classList.remove('active');
+                        
+                        // Move to next stage
+                        moveToStage(7);
+                    }, 1500);
                 }, 1000);
             }
-            
-            // Enter new stage
-            setTimeout(() => {
-                const newStageEl = document.getElementById(`stage${stageNumber}`);
-                if (newStageEl) {
-                    newStageEl.classList.add('active');
-                    currentStage = stageNumber;
-                    
-                    // Set up the new stage
-                    switch(stageNumber) {
-                        case 0:
-                            setupStage0();
-                            break;
-                        case 1:
-                            setupStage1();
-                            break;
-                        case 2:
-                            setupStage2();
-                            break;
-                        case 3:
-                            setupStage3();
-                            break;
-                        case 4:
-                            setupStage4();
-                            break;
-                    }
-                    
-                    // Add stage transition effect
-                    triggerGlitch(0.5);
-                }
-            }, 1000);
         }
+        
+        // Calculate and display reward in stage 7
+        function calculateReward() {
+            finalScore.textContent = points;
+            
+            if (futureIntentConfirmed) {
+                futureIntentItem.style.display = 'flex';
+                rewardMessage.textContent = "Congratulations! You've unlocked the 30% loyalty bonus!";
+                rewardMessage.className = "success";
+            } else {
+                standardRebateItem.style.display = 'flex';
+                rewardMessage.textContent = "Standard reward applied. Every little bit helps!";
+            }
+            
+            // Move to next stage after a delay
+            setTimeout(() => {
+                moveToStage(8);
+            }, 4000);
+        }
+        
+        // Start system sync in stage 8
+        function startSystemSync() {
+            let syncProgressValue = 0;
+            const syncInterval = setInterval(() => {
+                syncProgressValue += 0.5;
+                syncProgress.style.width = `${syncProgressValue}%`;
+                
+                // Update messages based on progress
+                if (syncProgressValue < 25) {
+                    syncMessage.textContent = futureIntentConfirmed ? 
+                        "Syncing your 30% discount... a wise choice." : 
+                        "Applying your... generous 0.1% rebate. Every little bit helps.";
+                } else if (syncProgressValue < 50) {
+                    syncMessage.textContent = "You've been here a while. We appreciate your... cooperation.";
+                } else if (syncProgressValue < 75) {
+                    syncMessage.textContent = "The system is now stable. Feel free to browse our actual products.";
+                } else {
+                    syncMessage.textContent = "Finalizing your reality... please hold.";
+                }
+                
+                // Gradually reduce glitch effects and transition to clean design
+                if (syncProgressValue > 50) {
+                    fanSound.volume = Math.max(0, 0.3 - (syncProgressValue - 50) / 50);
+                    staticOverlay.style.opacity = Math.max(0, 0.1 - (syncProgressValue - 50) / 100);
+                }
+                
+                if (syncProgressValue > 80) {
+                    document.body.classList.add('stable');
+                }
+                
+                if (syncProgressValue >= 100) {
+                    clearInterval(syncInterval);
+                    
+                    // Show final message and redirect
+                    setTimeout(() => {
+                        document.getElementById('stage8').innerHTML = `
+                            <h1>SYNC COMPLETE</h1>
+                            <div class="message-box">
+                                <p>Thank you for your participation.</p>
+                                <p>Redirecting to our store...</p>
+                            </div>
+                        `;
+                        
+                        // In a real implementation, this would redirect to your website
+                        setTimeout(() => {
+                            alert("Redirecting to https://notthebestplacetobuystuff.in...");
+                            // window.location.href = "https://notthebestplacetobuystuff.in";
+                        }, 2000);
+                    }, 1000);
+                }
+            }, 100); // 4 minutes total (240 seconds) would be 24000ms, but we're speeding it up for demo
+        }
+        
+        // Initialize the application
+        init();
     </script>
 </body>
 </html>
