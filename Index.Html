@@ -4,18 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System 7 Receipt Printer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+New:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Courier New', monospace;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        
+        :root {
+            --phosphor-green: #39ff14;
+            --crt-glow: rgba(57, 255, 20, 0.1);
+            --dark-bg: #0a0a0a;
+            --error-red: #ff003c;
+            --future-blue: #4d4dff;
         }
         
         body {
-            background: #0a0a0a;
-            color: #00ff00;
+            background: var(--dark-bg);
+            color: var(--phosphor-green);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -23,23 +31,95 @@
             justify-content: center;
             overflow: hidden;
             position: relative;
-            transition: all 2s ease;
+            transition: all 3s ease;
+            font-weight: 500;
+        }
+        
+        /* CRT Monitor Effect */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+        
+        .crt-curvature {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: 
+                inset 0 0 60px rgba(0, 0, 0, 0.9),
+                inset 0 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 101;
+            pointer-events: none;
+        }
+        
+        .crt-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                transparent 0%,
+                var(--crt-glow) 70%,
+                transparent 100%
+            );
+            z-index: 102;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+        
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                transparent 0%,
+                rgba(0, 0, 0, 0.8) 100%
+            );
+            z-index: 103;
+            pointer-events: none;
+        }
+        
+        body.stable .crt-overlay,
+        body.stable .crt-curvature,
+        body.stable .crt-glow,
+        body.stable .vignette {
+            opacity: 0;
+            transition: opacity 2s ease;
         }
         
         body.stable {
-            background: #f0f0f0;
+            background: #f5f5f5;
             color: #333;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 30px;
             z-index: 10;
+            position: relative;
         }
         
         .stage {
@@ -58,11 +138,12 @@
             background: #fff;
             color: #000;
             width: 100%;
-            padding: 25px;
+            padding: 30px;
             margin: 20px 0;
             position: relative;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
             border: 1px solid #333;
+            transform: perspective(1000px) rotateX(2deg);
         }
         
         .receipt::before, .receipt::after {
@@ -98,10 +179,11 @@
         .receipt-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 10px 0;
             border-bottom: 1px dotted #ccc;
             cursor: pointer;
             transition: all 0.3s;
+            position: relative;
         }
         
         .receipt-item:hover {
@@ -109,10 +191,30 @@
             padding-left: 10px;
         }
         
+        .receipt-item:hover::after {
+            content: "[DE-AUTHORIZE]";
+            position: absolute;
+            right: 10px;
+            color: var(--error-red);
+            opacity: 0.7;
+            animation: flicker 0.5s infinite;
+        }
+        
         .receipt-item.crossed {
-            text-decoration: line-through;
-            color: #999;
-            background-color: #f9f9f9;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .receipt-item.crossed::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--error-red);
+            animation: strike 0.3s ease-out forwards;
+            transform-origin: left;
         }
         
         .receipt-footer {
@@ -123,130 +225,189 @@
         }
         
         .btn {
-            background: #333;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            padding: 12px 25px;
-            margin: 10px;
+            background: #1a1a1a;
+            color: var(--phosphor-green);
+            border: 1px solid var(--phosphor-green);
+            padding: 14px 28px;
+            margin: 12px;
             cursor: pointer;
             font-size: 16px;
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(57, 255, 20, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
         }
         
         .btn:hover {
-            background: #00ff00;
+            background: var(--phosphor-green);
             color: #000;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+        }
+        
+        .btn-unstable {
+            animation: glitch 0.5s infinite;
+            border-color: var(--error-red);
+            color: var(--error-red);
+        }
+        
+        .btn-pulse {
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
         }
         
         .message-box {
-            background: rgba(0, 255, 0, 0.1);
+            background: rgba(57, 255, 20, 0.05);
             padding: 20px;
             margin: 20px 0;
             text-align: center;
-            border: 1px solid #00ff00;
+            border: 1px solid var(--phosphor-green);
             width: 100%;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.1);
         }
         
         .game-container {
             width: 100%;
-            height: 400px;
+            height: 450px;
             background: #111;
             position: relative;
             overflow: hidden;
             margin: 20px 0;
-            border: 1px solid #00ff00;
+            border: 1px solid var(--phosphor-green);
+            border-radius: 5px;
         }
         
         .basket {
             position: absolute;
-            bottom: 10px;
-            width: 100px;
-            height: 30px;
-            background: #00ff00;
+            bottom: 15px;
+            width: 120px;
+            height: 35px;
+            background: var(--phosphor-green);
             transition: left 0.1s;
+            border-radius: 3px 3px 0 0;
+            box-shadow: 0 -3px 10px rgba(57, 255, 20, 0.5);
         }
         
         .falling-item {
             position: absolute;
-            padding: 8px 12px;
+            padding: 10px;
             border-radius: 5px;
-            font-size: 14px;
+            font-size: 24px;
             text-align: center;
             transition: transform 0.1s;
+            font-weight: bold;
+            z-index: 5;
         }
         
         .falling-item.true-data {
-            background: #00ff00;
+            background: var(--phosphor-green);
             color: #000;
-            box-shadow: 0 0 10px #00ff00;
+            box-shadow: 0 0 15px var(--phosphor-green);
         }
         
         .falling-item.corrupted {
-            background: #ff0000;
+            background: var(--error-red);
             color: #fff;
-            box-shadow: 0 0 10px #ff0000;
+            box-shadow: 0 0 15px var(--error-red);
         }
         
         .falling-item.rare {
             background: gold;
             color: #000;
-            box-shadow: 0 0 20px gold;
-            animation: pulse 1s infinite;
+            box-shadow: 0 0 25px gold;
+            animation: rotate 3s infinite linear, pulse 1.5s infinite;
         }
         
         .points-display {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px;
+            right: 15px;
             background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            font-size: 18px;
-            border: 1px solid #00ff00;
+            padding: 12px 18px;
+            font-size: 20px;
+            border: 1px solid var(--phosphor-green);
+            border-radius: 5px;
+            z-index: 10;
         }
         
         .progress-bar {
             width: 100%;
-            height: 20px;
+            height: 25px;
             background: #111;
             margin: 20px 0;
             overflow: hidden;
-            border: 1px solid #00ff00;
+            border: 1px solid var(--phosphor-green);
+            border-radius: 3px;
+            position: relative;
         }
         
         .progress {
             height: 100%;
-            background: #00ff00;
+            background: linear-gradient(90deg, var(--phosphor-green), #4d4dff);
             width: 0%;
             transition: width 0.5s;
+            border-radius: 2px;
         }
         
-        .glitch {
-            animation: glitch 1s infinite;
+        .progress-label {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 0 5px black;
         }
         
         .typewriter {
             overflow: hidden;
-            border-right: 2px solid #00ff00;
+            border-right: 2px solid var(--phosphor-green);
             white-space: nowrap;
             margin: 0 auto;
             animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
         }
         
         .access-denied {
-            color: #ff0000;
-            animation: shake 0.5s;
+            color: var(--error-red);
+            animation: shake 0.5s, glitch-text 0.3s 3;
             text-transform: uppercase;
+            font-weight: bold;
+            font-size: 24px;
         }
         
         .success {
-            color: #00ff00;
+            color: var(--phosphor-green);
             animation: pulse 1s;
         }
         
         .location {
             color: #ffff00;
+            animation: location-glitch 0.5s;
+        }
+        
+        .future-item {
+            color: var(--future-blue);
+            text-shadow: 0 0 10px var(--future-blue);
         }
         
         .ice-overlay {
@@ -255,10 +416,11 @@
             left: 0;
             width: 100%;
             height: 0%;
-            background: linear-gradient(to top, rgba(173, 216, 230, 0.8), rgba(240, 248, 255, 0.9));
-            z-index: 5;
-            transition: height 5s linear;
+            background: linear-gradient(to top, rgba(173, 216, 230, 0.9), rgba(240, 248, 255, 0.95));
+            z-index: 50;
+            transition: height 20s linear;
             pointer-events: none;
+            opacity: 0.9;
         }
         
         .ice-overlay.active {
@@ -271,34 +433,67 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M10,10 L90,90 M30,10 L70,90 M50,10 L50,90 M10,30 L90,70 M10,50 L90,50" stroke="white" stroke-width="2" fill="none" /></svg>');
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,0.6) 1px, transparent 1px),
+                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.7) 1px, transparent 1px);
+            background-size: 50px 50px;
             opacity: 0;
-            z-index: 6;
+            z-index: 51;
             pointer-events: none;
         }
         
         .ice-crack.active {
-            animation: crack 0.5s forwards;
+            animation: crack 0.8s forwards;
         }
         
         .questionnaire {
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border: 2px solid #00aaff;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 25px;
+            border: 2px solid #4d4dff;
             border-radius: 10px;
             margin: 20px 0;
-            z-index: 10;
+            z-index: 60;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 30px rgba(77, 77, 255, 0.3);
         }
         
         .question {
-            margin: 15px 0;
+            margin: 20px 0;
             text-align: center;
+            font-size: 22px;
         }
         
         .timer {
-            font-size: 24px;
-            margin: 10px 0;
+            font-size: 28px;
+            margin: 15px 0;
             color: #ff9900;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff9900;
+        }
+        
+        .calculation-terminal {
+            background: #000;
+            color: var(--phosphor-green);
+            padding: 30px;
+            border: 2px solid var(--phosphor-green);
+            border-radius: 5px;
+            margin: 20px 0;
+            width: 100%;
+            min-height: 200px;
+            font-family: 'IBM Plex Mono', monospace;
+            box-shadow: 0 0 25px rgba(57, 255, 20, 0.2);
+        }
+        
+        .terminal-line {
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: terminal-print 0.5s forwards;
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
         }
         
         @keyframes fadeIn {
@@ -307,12 +502,21 @@
         }
         
         @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
+            0% { transform: translate(0); filter: hue-rotate(0deg); }
+            20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            40% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+            60% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+            80% { transform: translate(2px, -2px); filter: hue-rotate(300deg); }
+            100% { transform: translate(0); filter: hue-rotate(360deg); }
+        }
+        
+        @keyframes glitch-text {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-3px); }
+            40% { transform: translateX(3px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+            100% { transform: translateX(0); }
         }
         
         @keyframes typing {
@@ -322,19 +526,19 @@
         
         @keyframes blink-caret {
             from, to { border-color: transparent; }
-            50% { border-color: #00ff00; }
+            50% { border-color: var(--phosphor-green); }
         }
         
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
         }
         
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
+            0% { opacity: 1; box-shadow: 0 0 15px currentColor; }
+            50% { opacity: 0.8; box-shadow: 0 0 25px currentColor; }
+            100% { opacity: 1; box-shadow: 0 0 15px currentColor; }
         }
         
         @keyframes print {
@@ -343,8 +547,41 @@
         
         @keyframes crack {
             0% { opacity: 0; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
             100% { opacity: 0; transform: scale(1.2); }
+        }
+        
+        @keyframes strike {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 0.3; }
+        }
+        
+        @keyframes location-glitch {
+            0% { transform: translateX(0); opacity: 1; }
+            25% { transform: translateX(-5px); opacity: 0.5; }
+            50% { transform: translateX(5px); opacity: 0.2; }
+            75% { transform: translateX(-3px); opacity: 0.7; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes terminal-print {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
         
         .print-line {
@@ -353,14 +590,16 @@
         }
         
         h1 {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            font-weight: 600;
+            text-shadow: 0 0 10px var(--phosphor-green);
         }
         
         .emoji {
-            font-size: 20px;
+            font-size: 22px;
             margin: 0 5px;
         }
         
@@ -378,7 +617,7 @@
                 transparent 2px
             );
             pointer-events: none;
-            z-index: 100;
+            z-index: 104;
             opacity: 0.1;
         }
         
@@ -392,23 +631,54 @@
             100% { background-position: 0 10px; }
         }
         
+        .screen-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .screen-flash.active {
+            animation: flash 0.3s;
+        }
+        
+        @keyframes flash {
+            0% { opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+        
         @media (max-width: 600px) {
             .container {
-                padding: 10px;
-            }
-            
-            .receipt {
                 padding: 15px;
             }
             
+            .receipt {
+                padding: 20px;
+            }
+            
             .game-container {
-                height: 300px;
+                height: 350px;
+            }
+            
+            .question {
+                font-size: 18px;
             }
         }
     </style>
 </head>
 <body>
+    <div class="crt-overlay"></div>
+    <div class="crt-curvature"></div>
+    <div class="crt-glow"></div>
+    <div class="vignette"></div>
     <div class="static" id="staticOverlay"></div>
+    <div class="screen-flash" id="screenFlash"></div>
     <div class="ice-overlay" id="iceOverlay"></div>
     <div class="ice-crack" id="iceCrack"></div>
     
@@ -485,8 +755,8 @@
             </div>
             <div class="progress-bar">
                 <div class="progress" id="printProgress"></div>
+                <div class="progress-label" id="printStatus">Initializing printer...</div>
             </div>
-            <p id="printStatus">Initializing printer...</p>
             <div id="corruptionMessage" class="message-box" style="display: none;">
                 <p>[...memory corruption detected, <span id="clickToRestore" style="text-decoration: underline; cursor: pointer;">accessing predictive datastream...</span>...]</p>
             </div>
@@ -502,8 +772,8 @@
                 <h2>Print buffer overflow</h2>
                 <p>The system is glitched.</p>
             </div>
-            <button class="btn" id="tryAgainBtn">Try Again</button>
-            <button class="btn" id="fixGlitchBtn">Attempt to Fix the Glitch</button>
+            <button class="btn btn-unstable" id="tryAgainBtn">Try Again</button>
+            <button class="btn btn-pulse" id="fixGlitchBtn">Attempt to Fix the Glitch</button>
         </div>
         
         <!-- Stage 5: The Data Recovery Mini-Game -->
@@ -537,29 +807,8 @@
         <!-- Stage 7: The Reward Calculation -->
         <div id="stage7" class="stage">
             <h1>CALCULATING FINAL REWARD</h1>
-            <div class="receipt">
-                <div class="receipt-header">
-                    <h2>LOYALTY REWARD CALCULATION</h2>
-                </div>
-                
-                <div class="receipt-item">
-                    <span>Data Fragments Recovered</span>
-                    <span>+<span id="finalScore">0</span> points</span>
-                </div>
-                
-                <div class="receipt-item" id="futureIntentItem" style="display: none;">
-                    <span>Future Intent Confirmed</span>
-                    <span>30% LOYALTY BONUS UNLOCKED</span>
-                </div>
-                
-                <div class="receipt-item" id="standardRebateItem" style="display: none;">
-                    <span>Future Intent Unconfirmed</span>
-                    <span>Standard 0.1% Rebate Applied</span>
-                </div>
-                
-                <div class="receipt-footer">
-                    <p id="rewardMessage">Calculating your final reward...</p>
-                </div>
+            <div class="calculation-terminal" id="calculationTerminal">
+                <!-- Calculation lines will be added here -->
             </div>
         </div>
         
@@ -572,18 +821,24 @@
             
             <div class="progress-bar">
                 <div class="progress" id="syncProgress"></div>
+                <div class="progress-label" id="syncStatus">0%</div>
             </div>
             
             <div id="finalMessages">
                 <!-- Messages will be added here -->
             </div>
-            
-            <p>Redirecting in <span id="countdown">5</span> seconds...</p>
         </div>
     </div>
 
-    <audio id="fanSound" loop>
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-computer-fan-noise-1381.mp3" type="audio/mpeg">
+    <!-- Audio Elements -->
+    <audio id="serverHum" loop>
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-server-hum-1381.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="hardDriveClick">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-hard-drive-click-1382.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="typeSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-typewriter-key-1383.mp3" type="audio/mpeg">
     </audio>
     <audio id="printSound">
         <source src="https://assets.mixkit.co/sfx/preview/mixkit-printer-scan-2772.mp3" type="audio/mpeg">
@@ -606,6 +861,24 @@
     <audio id="shatterSound">
         <source src="https://assets.mixkit.co/sfx/preview/mixkit-glass-break-with-huge-splatter-2580.mp3" type="audio/mpeg">
     </audio>
+    <audio id="stompSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-stomp-1384.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="dataChirp">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-data-chirp-1385.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="synthTone">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-synth-tone-1386.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="windHum">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wind-hum-1387.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="thudSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-thud-1388.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="processingSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-data-processing-1389.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         // Stage management
@@ -626,15 +899,14 @@
         
         // Items for the mini-game
         const gameItems = [
-            { text: "Productivity Chip", emoji: "💾", type: "true" },
-            { text: "Focus Bean", emoji: "🔮", type: "true" },
-            { text: "Memory Boost", emoji: "🧠", type: "true" },
-            { text: "Clarity Module", emoji: "💎", type: "true" },
-            { text: "Existential Dread", emoji: "😱", type: "corrupted" },
-            { text: "Lag Spike", emoji: "⚡", type: "corrupted" },
-            { text: "Data Corruption", emoji: "💥", type: "corrupted" },
-            { text: "System Error", emoji: "❌", type: "corrupted" },
-            { text: "TRUE_SELF_FRAGMENT", emoji: "⭐", type: "rare" }
+            { text: "+", emoji: "", type: "true" },
+            { text: "+", emoji: "", type: "true" },
+            { text: "+", emoji: "", type: "true" },
+            { text: "+", emoji: "", type: "true" },
+            { text: "X", emoji: "", type: "corrupted" },
+            { text: "X", emoji: "", type: "corrupted" },
+            { text: "X", emoji: "", type: "corrupted" },
+            { text: "◆", emoji: "", type: "rare" }
         ];
         
         // Questions for the questionnaire
@@ -656,9 +928,9 @@
         const accessDenied = document.getElementById('accessDenied');
         const pointsDisplay = document.getElementById('points');
         const gameTimeDisplay = document.getElementById('gameTime');
-        const countdownDisplay = document.getElementById('countdown');
         const printProgress = document.getElementById('printProgress');
         const syncProgress = document.getElementById('syncProgress');
+        const syncStatus = document.getElementById('syncStatus');
         const printStatus = document.getElementById('printStatus');
         const corruptedPrintContent = document.getElementById('corruptedPrintContent');
         const corruptionMessage = document.getElementById('corruptionMessage');
@@ -667,19 +939,19 @@
         const basket = document.getElementById('basket');
         const gameContainer = document.getElementById('gameContainer');
         const staticOverlay = document.getElementById('staticOverlay');
+        const screenFlash = document.getElementById('screenFlash');
         const iceOverlay = document.getElementById('iceOverlay');
         const iceCrack = document.getElementById('iceCrack');
         const questionnaire = document.getElementById('questionnaire');
         const questionTimer = document.getElementById('questionTimer');
-        const finalScore = document.getElementById('finalScore');
-        const futureIntentItem = document.getElementById('futureIntentItem');
-        const standardRebateItem = document.getElementById('standardRebateItem');
-        const rewardMessage = document.getElementById('rewardMessage');
+        const calculationTerminal = document.getElementById('calculationTerminal');
         const syncMessage = document.getElementById('syncMessage');
         const finalMessages = document.getElementById('finalMessages');
         
         // Audio elements
-        const fanSound = document.getElementById('fanSound');
+        const serverHum = document.getElementById('serverHum');
+        const hardDriveClick = document.getElementById('hardDriveClick');
+        const typeSound = document.getElementById('typeSound');
         const printSound = document.getElementById('printSound');
         const buzzerSound = document.getElementById('buzzerSound');
         const successSound = document.getElementById('successSound');
@@ -687,12 +959,26 @@
         const chimeSound = document.getElementById('chimeSound');
         const iceSound = document.getElementById('iceSound');
         const shatterSound = document.getElementById('shatterSound');
+        const stompSound = document.getElementById('stompSound');
+        const dataChirp = document.getElementById('dataChirp');
+        const synthTone = document.getElementById('synthTone');
+        const windHum = document.getElementById('windHum');
+        const thudSound = document.getElementById('thudSound');
+        const processingSound = document.getElementById('processingSound');
         
         // Initialize the experience
         function init() {
-            // Start with fan sound
-            fanSound.volume = 0.3;
-            fanSound.play();
+            // Start with server hum
+            serverHum.volume = 0.3;
+            serverHum.play();
+            
+            // Play occasional hard drive clicks
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    hardDriveClick.currentTime = 0;
+                    hardDriveClick.play();
+                }
+            }, 5000);
             
             // Event listeners
             verifyBtn.addEventListener('click', verifySelection);
@@ -702,6 +988,13 @@
             
             // Add click events to receipt items
             document.querySelectorAll('.receipt-item').forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    // Play subtle digital tick on hover
+                    typeSound.currentTime = 0;
+                    typeSound.volume = 0.3;
+                    typeSound.play();
+                });
+                
                 item.addEventListener('click', toggleItemSelection);
             });
             
@@ -718,19 +1011,50 @@
         
         // Start the welcome sequence with typing effect
         function startWelcomeSequence() {
-            setTimeout(() => {
-                // Add personal location after initial message
-                const locationMessage = document.createElement('span');
-                locationMessage.textContent = `...Let's print it for you, user from ${userLocation}.`;
-                locationMessage.className = 'location';
-                welcomeMessage.appendChild(locationMessage);
-                
-                // Show printer animation after a delay
-                setTimeout(() => {
-                    printerAnimation.style.display = 'block';
-                    startPrinterAnimation();
-                }, 2000);
-            }, 4000);
+            // Play typing sound for each character
+            const text = welcomeMessage.textContent;
+            welcomeMessage.textContent = '';
+            let i = 0;
+            
+            function typeWriter() {
+                if (i < text.length) {
+                    welcomeMessage.textContent += text.charAt(i);
+                    typeSound.currentTime = 0;
+                    typeSound.volume = 0.5;
+                    typeSound.play();
+                    i++;
+                    setTimeout(typeWriter, 70);
+                } else {
+                    // Location glitch effect
+                    setTimeout(() => {
+                        const originalText = welcomeMessage.textContent;
+                        welcomeMessage.textContent = 'S3@r(h1n9... 3n71t% d3t3(t3d. Th1$ 1$ @ $y$t3m 7 R3(31p+ Pr1n+3r. Y0u\'v3 m@d3 @ pur(h@s3, @nd w3 h@v3 th3 r3(0rd. L3t\'$ pr1n+ 1+ f0r y0u.';
+                        
+                        glitchSound.currentTime = 0;
+                        glitchSound.play();
+                        dataChirp.currentTime = 0;
+                        dataChirp.play();
+                        
+                        setTimeout(() => {
+                            welcomeMessage.textContent = originalText + `...Let's print it for you, user from ${userLocation}.`;
+                            welcomeMessage.classList.add('location');
+                            
+                            setTimeout(() => {
+                                welcomeMessage.classList.remove('location');
+                                welcomeMessage.textContent = originalText;
+                                
+                                // Show printer animation after a delay
+                                setTimeout(() => {
+                                    printerAnimation.style.display = 'block';
+                                    startPrinterAnimation();
+                                }, 1000);
+                            }, 800);
+                        }, 500);
+                    }, 1000);
+                }
+            }
+            
+            typeWriter();
         }
         
         // Simulate printer animation
@@ -779,6 +1103,9 @@
             switch(stage) {
                 case 2:
                     resetSelection();
+                    synthTone.currentTime = 0;
+                    synthTone.volume = 0.4;
+                    synthTone.play();
                     break;
                 case 3:
                     startCorruptedPrinting();
@@ -812,6 +1139,10 @@
                 if (selectedItems.length < 2) {
                     selectedItems.push(itemId);
                     item.classList.add('crossed');
+                    
+                    // Play stomp sound
+                    stompSound.currentTime = 0;
+                    stompSound.play();
                 }
             }
             
@@ -838,7 +1169,14 @@
             
             if (isCorrect) {
                 // Play success sound
+                successSound.currentTime = 0;
                 successSound.play();
+                
+                // Screen flash
+                screenFlash.classList.add('active');
+                setTimeout(() => {
+                    screenFlash.classList.remove('active');
+                }, 300);
                 
                 // Add glitch effect
                 document.body.classList.add('glitch');
@@ -852,7 +1190,14 @@
                 }, 1500);
             } else {
                 // Play buzzer sound
+                buzzerSound.currentTime = 0;
                 buzzerSound.play();
+                
+                // Screen shake
+                document.body.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    document.body.style.animation = '';
+                }, 500);
                 
                 // Show access denied message
                 accessDenied.style.display = 'block';
@@ -888,7 +1233,7 @@
             ];
             
             const surrealLines = [
-                "Neuralink Subscription (Trial)..₹0",
+                "Neuralink Subscription (2025)....₹0",
                 "Anti-Gravity Boots.........₹12,499",
                 "A Forgotten Memory..........₹N/A",
                 "Time Crystal................₹7,999",
@@ -916,6 +1261,7 @@
                             return;
                         }
                         line.textContent = surrealLines[lineIndex - normalLines.length];
+                        line.classList.add('future-item');
                     }
                     
                     line.classList.add('print-line');
@@ -952,9 +1298,13 @@
             corruptionMessage.style.display = 'none';
             reassuranceMessage.style.display = 'block';
             
+            // Play whoosh sound
+            glitchSound.currentTime = 0;
+            glitchSound.play();
+            
             // Continue with surreal printing
             const surrealLines = [
-                "Neuralink Subscription (Trial)..₹0",
+                "Neuralink Subscription (2025)....₹0",
                 "Anti-Gravity Boots.........₹12,499",
                 "A Forgotten Memory..........₹N/A",
                 "Time Crystal................₹7,999",
@@ -970,6 +1320,7 @@
                     const line = document.createElement('p');
                     line.textContent = surrealLines[lineIndex];
                     line.classList.add('print-line');
+                    line.classList.add('future-item');
                     corruptedPrintContent.appendChild(line);
                     
                     // Scroll to bottom
@@ -1008,8 +1359,12 @@
                 staticOverlay.classList.remove('active');
             }, 1000);
             
-            // Increase fan sound volume
-            fanSound.volume = Math.min(0.7, 0.3 + (tryAgainCount * 0.1));
+            // Increase server hum volume
+            serverHum.volume = Math.min(0.7, 0.3 + (tryAgainCount * 0.1));
+            
+            // Play tearing sound
+            glitchSound.currentTime = 0;
+            glitchSound.play();
             
             // Go back to stage 3
             moveToStage(3);
@@ -1059,7 +1414,7 @@
             const item = document.createElement('div');
             const randomItem = gameItems[Math.floor(Math.random() * gameItems.length)];
             
-            item.textContent = `${randomItem.text} ${randomItem.emoji}`;
+            item.textContent = randomItem.text;
             item.classList.add('falling-item');
             item.classList.add(
                 randomItem.type === 'true' ? 'true-data' : 
@@ -1090,26 +1445,44 @@
                 ) {
                     // Item caught
                     clearInterval(fallInterval);
-                    item.remove();
+                    
+                    // Visual effect - flash and dissolve
+                    item.style.animation = 'pulse 0.3s';
+                    setTimeout(() => {
+                        item.remove();
+                    }, 300);
                     
                     if (randomItem.type === 'true') {
                         points += 10;
                         pointsDisplay.textContent = points;
+                        
+                        // Play bloop sound
                         successSound.currentTime = 0;
+                        successSound.volume = 0.5;
                         successSound.play();
+                        
+                        // Score counter tick
+                        typeSound.currentTime = 0;
+                        typeSound.volume = 0.3;
+                        typeSound.play();
                     } else if (randomItem.type === 'rare') {
                         points += 50;
                         pointsDisplay.textContent = points;
+                        
+                        // Play triumphant chime
                         chimeSound.currentTime = 0;
                         chimeSound.play();
                     } else {
                         // Corrupted item - screen shake
-                        document.body.classList.add('glitch');
+                        document.body.style.animation = 'shake 0.3s';
                         setTimeout(() => {
-                            document.body.classList.remove('glitch');
-                        }, 500);
-                        glitchSound.currentTime = 0;
-                        glitchSound.play();
+                            document.body.style.animation = '';
+                        }, 300);
+                        
+                        // Play buzz sound
+                        buzzerSound.currentTime = 0;
+                        buzzerSound.volume = 0.4;
+                        buzzerSound.play();
                     }
                 }
                 
@@ -1158,8 +1531,9 @@
             questionTimer.textContent = questionTimeLeft;
             questionnaire.innerHTML = '';
             
-            // Start ice effect
+            // Start ice effect and sound
             iceSound.play();
+            windHum.play();
             iceOverlay.classList.add('active');
             
             // Display questions one by one
@@ -1216,17 +1590,28 @@
             questionDiv.appendChild(noBtn);
             
             questionnaire.appendChild(questionDiv);
+            
+            // Play thud sound for new question
+            thudSound.currentTime = 0;
+            thudSound.play();
         }
         
         // End the questionnaire
         function endQuestionnaire() {
             clearInterval(questionnaireTimer);
+            windHum.pause();
             
             if (futureIntentConfirmed) {
                 // Ice shatters
                 iceSound.pause();
                 shatterSound.play();
                 iceCrack.classList.add('active');
+                
+                // Screen flash
+                screenFlash.classList.add('active');
+                setTimeout(() => {
+                    screenFlash.classList.remove('active');
+                }, 300);
                 
                 setTimeout(() => {
                     iceOverlay.classList.remove('active');
@@ -1240,11 +1625,16 @@
             } else {
                 // Screen freezes completely
                 setTimeout(() => {
-                    document.body.style.filter = 'blur(3px)';
+                    document.body.style.filter = 'blur(5px) grayscale(50%)';
                     
                     setTimeout(() => {
                         document.body.style.filter = 'none';
                         iceOverlay.classList.remove('active');
+                        
+                        // Play failure tone
+                        buzzerSound.currentTime = 0;
+                        buzzerSound.volume = 0.3;
+                        buzzerSound.play();
                         
                         // Move to next stage
                         moveToStage(7);
@@ -1255,21 +1645,86 @@
         
         // Calculate and display reward in stage 7
         function calculateReward() {
-            finalScore.textContent = points;
+            calculationTerminal.innerHTML = '';
             
-            if (futureIntentConfirmed) {
-                futureIntentItem.style.display = 'flex';
-                rewardMessage.textContent = "Congratulations! You've unlocked the 30% loyalty bonus!";
-                rewardMessage.className = "success";
-            } else {
-                standardRebateItem.style.display = 'flex';
-                rewardMessage.textContent = "Standard reward applied. Every little bit helps!";
-            }
+            // Start processing sound
+            processingSound.play();
             
-            // Move to next stage after a delay
+            // Add blinking cursor
+            const cursorLine = document.createElement('div');
+            cursorLine.className = 'terminal-line blink';
+            cursorLine.textContent = 'CALCULATING...';
+            calculationTerminal.appendChild(cursorLine);
+            
             setTimeout(() => {
-                moveToStage(8);
-            }, 4000);
+                // Remove blinking cursor
+                cursorLine.classList.remove('blink');
+                
+                // Add data fragments line
+                const fragmentsLine = document.createElement('div');
+                fragmentsLine.className = 'terminal-line';
+                fragmentsLine.textContent = `DATA FRAGMENTS RECOVERED: +${points}`;
+                calculationTerminal.appendChild(fragmentsLine);
+                
+                // Simulate number ticking
+                let displayPoints = 0;
+                const pointsInterval = setInterval(() => {
+                    displayPoints += Math.ceil(points / 10);
+                    if (displayPoints >= points) {
+                        displayPoints = points;
+                        clearInterval(pointsInterval);
+                        
+                        setTimeout(() => {
+                            // Add loyalty bonus line
+                            const bonusLine = document.createElement('div');
+                            bonusLine.className = 'terminal-line';
+                            
+                            if (futureIntentConfirmed) {
+                                bonusLine.textContent = 'LOYALTY BONUS: [CONFIRMED]';
+                                bonusLine.classList.add('success');
+                            } else {
+                                bonusLine.textContent = 'LOYALTY BONUS: [DENIED]';
+                            }
+                            
+                            calculationTerminal.appendChild(bonusLine);
+                            
+                            setTimeout(() => {
+                                // Add final reward line
+                                const rewardLine = document.createElement('div');
+                                rewardLine.className = 'terminal-line';
+                                
+                                if (futureIntentConfirmed) {
+                                    rewardLine.textContent = 'FINAL REWARD: 30% System Credit Applied.';
+                                    rewardLine.classList.add('success');
+                                    
+                                    // Play success chime
+                                    successSound.currentTime = 0;
+                                    successSound.play();
+                                } else {
+                                    rewardLine.textContent = 'FINAL REWARD: 0.1% Standard Rebate Applied.';
+                                    
+                                    // Play muted beep
+                                    typeSound.currentTime = 0;
+                                    typeSound.volume = 0.2;
+                                    typeSound.play();
+                                }
+                                
+                                calculationTerminal.appendChild(rewardLine);
+                                
+                                // Stop processing sound
+                                processingSound.pause();
+                                
+                                // Move to next stage after a delay
+                                setTimeout(() => {
+                                    moveToStage(8);
+                                }, 3000);
+                            }, 1000);
+                        }, 1000);
+                    } else {
+                        fragmentsLine.textContent = `DATA FRAGMENTS RECOVERED: +${displayPoints}`;
+                    }
+                }, 50);
+            }, 1500);
         }
         
         // Start system sync in stage 8
@@ -1278,6 +1733,7 @@
             const syncInterval = setInterval(() => {
                 syncProgressValue += 0.5;
                 syncProgress.style.width = `${syncProgressValue}%`;
+                syncStatus.textContent = `${Math.round(syncProgressValue)}%`;
                 
                 // Update messages based on progress
                 if (syncProgressValue < 25) {
@@ -1293,23 +1749,27 @@
                 }
                 
                 // Gradually reduce glitch effects and transition to clean design
-                if (syncProgressValue > 50) {
-                    fanSound.volume = Math.max(0, 0.3 - (syncProgressValue - 50) / 50);
-                    staticOverlay.style.opacity = Math.max(0, 0.1 - (syncProgressValue - 50) / 100);
+                if (syncProgressValue > 30) {
+                    staticOverlay.style.opacity = Math.max(0, 0.1 - (syncProgressValue - 30) / 140);
                 }
                 
-                if (syncProgressValue > 80) {
+                if (syncProgressValue > 50) {
+                    serverHum.volume = Math.max(0, 0.3 - (syncProgressValue - 50) / 100);
+                }
+                
+                if (syncProgressValue > 70) {
                     document.body.classList.add('stable');
                 }
                 
                 if (syncProgressValue >= 100) {
                     clearInterval(syncInterval);
+                    serverHum.pause();
                     
                     // Show final message and redirect
                     setTimeout(() => {
                         document.getElementById('stage8').innerHTML = `
-                            <h1>SYNC COMPLETE</h1>
-                            <div class="message-box">
+                            <h1 style="font-family: 'Segoe UI', sans-serif; color: #333;">SYNC COMPLETE</h1>
+                            <div class="message-box" style="background: rgba(0,0,0,0.05); border-color: #333; color: #333;">
                                 <p>Thank you for your participation.</p>
                                 <p>Redirecting to our store...</p>
                             </div>
@@ -1322,7 +1782,7 @@
                         }, 2000);
                     }, 1000);
                 }
-            }, 100); // 4 minutes total (240 seconds) would be 24000ms, but we're speeding it up for demo
+            }, 100);
         }
         
         // Initialize the application
