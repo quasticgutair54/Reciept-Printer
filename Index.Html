@@ -844,52 +844,52 @@
 
     <!-- Audio Elements -->
     <audio id="serverHum" loop>
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-server-hum-1381.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-electric-welding-and-sparkles-2603.mp3" type="audio/mpeg">
     </audio>
     <audio id="hardDriveClick">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-hard-drive-click-1382.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-typing-on-a-laptop-keyboard-2531.mp3" type="audio/mpeg">
     </audio>
     <audio id="typeSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-typewriter-key-1383.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-dropping-keys-in-the-floor-2839.mp3" type="audio/mpeg">
     </audio>
     <audio id="printSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-printer-scan-2772.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-farting-balloon-deflate-3052.mp3" type="audio/mpeg">
     </audio>
     <audio id="buzzerSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-robot-system-fail-2960.mp3" type="audio/mpeg">
     </audio>
     <audio id="successSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-clear-announce-tones-2861.mp3" type="audio/mpeg">
     </audio>
     <audio id="glitchSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-digital-glitch-2296.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-terror-radio-frequency-2566.mp3" type="audio/mpeg">
     </audio>
     <audio id="chimeSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-magic-sparkle-sound-3095.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-magic-transition-sweep-presentation-2638.mp3" type="audio/mpeg">
     </audio>
     <audio id="iceSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-ice-cracking-1254.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-huge-crowd-cheering-victory-462.mp3" type="audio/mpeg">
     </audio>
     <audio id="shatterSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-glass-break-with-huge-splatter-2580.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-dropping-ice-into-a-glass-2834.mp3" type="audio/mpeg">
     </audio>
     <audio id="stompSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-stomp-1384.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-golem-stomp-c-3046.mp3" type="audio/mpeg">
     </audio>
     <audio id="dataChirp">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-data-chirp-1385.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-papers-blowing-in-the-windstorm-2653.mp3" type="audio/mpeg">
     </audio>
     <audio id="synthTone">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-synth-tone-1386.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-horror-synth-tension-648.mp3" type="audio/mpeg">
     </audio>
     <audio id="windHum">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-wind-hum-1387.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-intense-electricity-humming-2131.mp3" type="audio/mpeg">
     </audio>
     <audio id="thudSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-thud-1388.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-falling-hit-on-gravel-756.mp3" type="audio/mpeg">
     </audio>
     <audio id="processingSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-data-processing-1389.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-pressing-a-security-code-2843.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -1178,55 +1178,41 @@
             });
         }
         
-        // Verify if selected items are correct
-        function verifySelection() {
-            // Check if selected items match the correct items (order doesn't matter)
-            const isCorrect = 
-                selectedItems.includes(1) && 
-                selectedItems.includes(3) && 
-                selectedItems.length === 2;
-            
-            if (isCorrect) {
-                // Play success sound
-                successSound.currentTime = 0;
-                successSound.play();
-                
-                // Screen flash
-                screenFlash.classList.add('active');
-                setTimeout(() => {
-                    screenFlash.classList.remove('active');
-                }, 300);
-                
-                // Add glitch effect
-                document.body.classList.add('glitch');
-                setTimeout(() => {
-                    document.body.classList.remove('glitch');
-                }, 1000);
-                
-                // Move to next stage
-                setTimeout(() => {
-                    moveToStage(3);
-                }, 1500);
-            } else {
-                // Play error sound
-                buzzerSound.currentTime = 0;
-                buzzerSound.play();
-                
-                // Screen shake
-                document.body.style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    document.body.style.animation = '';
-                }, 500);
-                
-                // Show access denied message
-                accessDenied.style.display = 'block';
-                
-                // Reset selection after a delay
-                setTimeout(() => {
-                    resetSelection();
-                }, 2000);
-            }
-        }
+        // --- FIX ---
+// Verify if selected items are correct
+function verifySelection() {
+    // Immediately disable the button to prevent multiple clicks while processing
+    verifyBtn.disabled = true;
+
+    // A more robust way to check if the selected items are correct, regardless of order
+    const isCorrect = selectedItems.length === correctItems.length && 
+                      selectedItems.sort().toString() === correctItems.sort().toString();
+
+    if (isCorrect) {
+        // SUCCESS PATH
+        successSound.currentTime = 0;
+        successSound.play();
+        screenFlash.classList.add('active');
+        setTimeout(() => screenFlash.classList.remove('active'), 300);
+
+        // Move to next stage after a delay
+        setTimeout(() => {
+            moveToStage(3);
+        }, 1500);
+    } else {
+        // FAILURE PATH
+        buzzerSound.currentTime = 0;
+        buzzerSound.play();
+        document.body.style.animation = 'shake 0.5s';
+        setTimeout(() => document.body.style.animation = '', 500);
+        accessDenied.style.display = 'block';
+
+        // Reset the selection so the user can try again
+        setTimeout(() => {
+            resetSelection();
+        }, 2000);
+    }
+}
         
         // Start corrupted printing in stage 3
         function startCorruptedPrinting() {
